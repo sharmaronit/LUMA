@@ -1,0 +1,39 @@
+Scenery photographs
+
+Real photographs from Unsplash, bundled for offline use. Cropped to 1920 × 1080 JPEG.
+License: https://unsplash.com/license
+
+- alpine-lake: https://images.unsplash.com/photo-1470770841072-f978cf4d019e
+- forest: https://images.unsplash.com/photo-1448375240586-882707db888b
+- coast: https://images.unsplash.com/photo-1518837695005-2083093ee35b
+- desert: https://images.unsplash.com/photo-1509316785289-025f5b846b35
+
+Original mountain: https://images.unsplash.com/photo-1464822759023-fed622ff2c3b
+
+Original AI-generated Luma collection, created 2026-10-22 using OpenAI image generation:
+
+- waterfall: https://images.unsplash.com/photo-1432405972618-c60b0225b8f9
+- tropical-water: https://images.unsplash.com/photo-1519046904884-53103b34b206
+- mountain-lake: https://images.unsplash.com/photo-1472396961693-142e6e269027
+
+Original Luma abstract collection
+
+Generated procedurally by scripts/generate-wallpapers.cjs (no third-party
+artwork). Free to redistribute with Luma.
+
+Public-domain scenery photographs (CC0 1.0), via Wikimedia Commons.
+No attribution is required; sources are listed for transparency.
+- aoraki-sunrise.jpg: Aoraki sunrise — "Aoraki Sunrise (Unsplash).jpg" by Aleks Dahlberg aleksdahlberg, CC0, https://commons.wikimedia.org/wiki/File:Aoraki_Sunrise_(Unsplash).jpg
+- dolomites.jpg: Dolomites — "Marmolada, Italy.jpg" by Marco Bonomo, CC0, https://commons.wikimedia.org/wiki/File:Marmolada,_Italy.jpg
+- summit-glow.jpg: Summit glow — "Matterhorn sunset 2016 (Unsplash).jpg" by Sam Ferrara samferrara, CC0, https://commons.wikimedia.org/wiki/File:Matterhorn_sunset_2016_(Unsplash).jpg
+- volcano-view.jpg: Volcano view — "Landscape-tree-nature-horizon-mountain-cloud.jpg" by ronniereymanjares, CC0, https://commons.wikimedia.org/wiki/File:Landscape-tree-nature-horizon-mountain-cloud.jpg
+- steppe-range.jpg: Steppe range — "Clouds gathering over snowy mountains (Unsplash).jpg" by Jeremy Bishop tidesinourveins, CC0, https://commons.wikimedia.org/wiki/File:Clouds_gathering_over_snowy_mountains_(Unsplash).jpg
+- green-summit.jpg: Green summit — "Mountain peak near Wolfgangsee Lake (Unsplash).jpg" by Charlie Harutaka charlieharutaka, CC0, https://commons.wikimedia.org/wiki/File:Mountain_peak_near_Wolfgangsee_Lake_(Unsplash).jpg
+- rose-peak.jpg: Rose peak — "Purple peak (Unsplash).jpg" by Esaias Tan esaiastann, CC0, https://commons.wikimedia.org/wiki/File:Purple_peak_(Unsplash).jpg
+- blue-summit.jpg: Blue summit — "Snowcap mountains in the sky (Unsplash).jpg" by Pedro Gandra pedrogandra, CC0, https://commons.wikimedia.org/wiki/File:Snowcap_mountains_in_the_sky_(Unsplash).jpg
+- misty-peak.jpg: Misty peak — "Majestic mountain by the lake (Unsplash).jpg" by Dustin Scarpitti dusty_blanco, CC0, https://commons.wikimedia.org/wiki/File:Majestic_mountain_by_the_lake_(Unsplash).jpg
+- golden-shore.jpg: Golden shore — "Family watching beach sunset (Unsplash).jpg" by David Straight davidstraight, CC0, https://commons.wikimedia.org/wiki/File:Family_watching_beach_sunset_(Unsplash).jpg
+- star-dunes.jpg: Star dunes — "Desert Skies (Unsplash).jpg" by Jared Evans chromogenic, CC0, https://commons.wikimedia.org/wiki/File:Desert_Skies_(Unsplash).jpg
+- twilight-lake.jpg: Twilight lake — "Purple shoreline sunset. (Unsplash).jpg" by MARIO PUTRA marioputra, CC0, https://commons.wikimedia.org/wiki/File:Purple_shoreline_sunset._(Unsplash).jpg
+- aurora-camp.jpg: Aurora camp — "Ken Cheung 2017 (Unsplash).jpg" by Ken Cheung kencheungphoto, CC0, https://commons.wikimedia.org/wiki/File:Ken_Cheung_2017_(Unsplash).jpg
+- lighthouse.jpg: Lighthouse — "The Whiteford Lighthouse (Unsplash).jpg" by Alfonso Ninguno alfonso_ninguno, CC0, https://commons.wikimedia.org/wiki/File:The_Whiteford_Lighthouse_(Unsplash).jpg

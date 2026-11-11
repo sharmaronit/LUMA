@@ -1,0 +1,15 @@
+# Luma debloat list: stock Android TV boxes (Mi Box, Nvidia Shield,
+# generic Amlogic / Rockchip).  Format: tier|package|description
+
+safe|com.google.android.leanbacklauncher.recommendations|Home screen recommendations
+safe|com.nvidia.tegrazone3|NVIDIA Games
+safe|com.nvidia.feedback|NVIDIA feedback
+safe|com.nvidia.stats|NVIDIA telemetry
+safe|com.plexapp.mediaserver.smb|Plex Media Server (Shield)
+
+aggressive|com.nvidia.ota|NVIDIA system updates
+aggressive|com.droidlogic.appinstall|Amlogic app installer
+
+launcher|com.google.android.leanbacklauncher|Android TV home (legacy)
+launcher|com.google.android.tvlauncher|Android TV home
+launcher|com.droidlogic.mboxlauncher|Amlogic stock launcher

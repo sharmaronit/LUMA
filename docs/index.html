@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Luma — a calm home screen for your TV</title>
+<meta name="description" content="Luma is a free, fast, ad-free home screen for Android TV and Google TV, with depth wallpapers, StandBy clocks and a built-in cleaner.">
+<meta name="theme-color" content="#07080c">
+<meta property="og:title" content="Luma — a calm home screen for your TV">
+<meta property="og:description" content="Free and open source. No ads. Depth wallpapers, StandBy and Clean my TV.">
+<meta property="og:image" content="assets/home.webp">
+<link rel="icon" href="assets/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Antonio:wght@200;400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080c; --ink:#f4f5f8; --muted:#a3a8b6; --line:rgba(255,255,255,.12);
+  --glass:rgba(255,255,255,.06); --glass-2:rgba(255,255,255,.1);
+  --a1:#7c8cff; --a2:#ff8fb1; --a3:#5fe3c8; --a4:#ffb36b;
+  --radius:28px; --gutter:clamp(18px,5vw,64px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:var(--gutter)}
+
+/* ---------- moving aurora background ---------- */
+.sky{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+.blob{position:absolute;width:60vmax;height:60vmax;border-radius:50%;filter:blur(80px);opacity:.42;will-change:transform}
+.b1{background:radial-gradient(circle,var(--a1),transparent 60%);top:-20vmax;left:-15vmax;animation:drift1 22s ease-in-out infinite alternate}
+.b2{background:radial-gradient(circle,var(--a2),transparent 60%);top:10vmax;right:-25vmax;animation:drift2 26s ease-in-out infinite alternate}
+.b3{background:radial-gradient(circle,var(--a3),transparent 60%);bottom:-30vmax;left:20vmax;animation:drift3 30s ease-in-out infinite alternate;opacity:.28}
+@keyframes drift1{to{transform:translate(18vmax,12vmax) scale(1.15)}}
+@keyframes drift2{to{transform:translate(-20vmax,16vmax) scale(.9)}}
+@keyframes drift3{to{transform:translate(-14vmax,-18vmax) scale(1.2)}}
+.grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.06;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+
+/* ---------- nav ---------- */
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;padding-block:14px}
+.bar{display:flex;align-items:center;gap:18px;padding:10px 12px 10px 18px;border-radius:999px;background:rgba(14,16,22,.55);border:1px solid var(--line);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.18em;font-size:15px}
+.brand img{width:28px;height:28px;border-radius:8px}
+.links{display:flex;gap:22px;margin-left:auto;font-size:14px;color:var(--muted)}
+.links a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:12px 22px;border-radius:999px;font-weight:600;font-size:15px;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s,background .25s}
+.btn:hover{transform:translateY(-2px) scale(1.03)}
+.btn-primary{background:#fff;color:#0b0d12;box-shadow:0 8px 30px rgba(255,255,255,.18)}
+.btn-primary:hover{box-shadow:0 12px 40px rgba(255,255,255,.32)}
+.btn-glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(12px)}
+.btn svg{width:18px;height:18px}
+nav .btn{padding:9px 18px;font-size:14px}
+@media(max-width:760px){.links{display:none}nav .btn{margin-left:auto}}
+
+/* ---------- hero ---------- */
+.hero{padding-block:clamp(48px,10vh,110px) 40px;text-align:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;background:var(--glass);border:1px solid var(--line);font-size:13px;color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--a3);box-shadow:0 0 0 0 var(--a3);animation:pulse 2.4s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 10px transparent}100%{box-shadow:0 0 0 0 transparent}}
+h1{font-size:clamp(56px,13vw,150px);line-height:.95;margin:22px 0 10px;font-weight:800;letter-spacing:-.04em;
+  background:linear-gradient(100deg,#fff 20%,var(--a1) 40%,var(--a2) 55%,#fff 75%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 7s linear infinite}
+@keyframes shine{to{background-position:-250% 0}}
+.lede{font-size:clamp(18px,2.4vw,23px);color:var(--muted);max-width:640px;margin:0 auto 30px}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.meta{margin-top:16px;font-size:13px;color:var(--muted)}
+
+/* TV mockup */
+.stage{perspective:1600px;margin-top:clamp(40px,7vh,80px)}
+.tv{position:relative;max-width:1040px;margin:0 auto;border-radius:22px;padding:10px;background:linear-gradient(145deg,#2a2d36,#0f1116);
+  box-shadow:0 60px 120px -30px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.08),0 0 120px -20px rgba(124,140,255,.35);
+  transform:rotateX(12deg) scale(.96);transition:transform .9s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.tv.on{transform:rotateX(0) scale(1)}
+.screen{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000}
+.screen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.04);transition:opacity 1s ease,transform 6s ease}
+.screen img.show{opacity:1;transform:scale(1)}
+.glare{position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.14),transparent 35%);pointer-events:none;mix-blend-mode:screen}
+.stand{width:22%;height:14px;margin:0 auto;border-radius:0 0 12px 12px;background:linear-gradient(#1b1d24,#0b0c10)}
+.caption{margin-top:18px;font-size:14px;color:var(--muted);min-height:1.6em;transition:opacity .4s}
+
+/* ---------- sections ---------- */
+section{padding-block:clamp(70px,12vh,130px)}
+.kicker{font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--a3);font-weight:600}
+h2{font-size:clamp(34px,5.5vw,62px);line-height:1.05;letter-spacing:-.03em;margin:12px 0 16px;font-weight:700}
+.sub{color:var(--muted);font-size:clamp(16px,2vw,19px);max-width:560px}
+.center{text-align:center}.center .sub{margin-inline:auto}
+
+.feature{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(28px,5vw,70px);align-items:center}
+.feature.flip{grid-template-columns:1fr 1.05fr}
+.feature.flip .shot{order:2}
+@media(max-width:860px){.feature,.feature.flip{grid-template-columns:1fr}.feature.flip .shot{order:0}}
+.shot{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);box-shadow:0 40px 90px -30px rgba(0,0,0,.85)}
+.shot img{width:100%;transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.shot:hover img{transform:scale(1.04)}
+.ticks{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:12px}
+.ticks li{display:flex;gap:12px;align-items:flex-start;color:#d9dce4}
+.ticks li::before{content:"";flex:none;width:20px;height:20px;margin-top:2px;border-radius:50%;background:var(--glass-2) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5L20 7'/></svg>") center/12px no-repeat;border:1px solid var(--line)}
+
+/* depth clock demo: live clock over a wallpaper */
+.depth{position:relative;aspect-ratio:16/9}
+.depth img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.live{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);text-align:center;font-family:Antonio,Inter,sans-serif;font-weight:200;line-height:.85;
+  font-size:clamp(70px,13vw,170px);color:rgba(255,255,255,.88);letter-spacing:.04em;text-shadow:0 6px 30px rgba(0,0,0,.25);
+  -webkit-text-stroke:1px rgba(255,255,255,.7);animation:breathe 6s ease-in-out infinite}
+.live small{display:block;font:600 clamp(11px,1.3vw,16px)/1.2 Inter,sans-serif;letter-spacing:.02em;-webkit-text-stroke:0;margin-bottom:8px;color:#fff}
+@keyframes breathe{50%{opacity:.82}}
+
+/* cards grid */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px}
+@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.card{position:relative;padding:28px;border-radius:24px;background:var(--glass);border:1px solid var(--line);overflow:hidden;
+  transition:transform .4s cubic-bezier(.2,.8,.2,1),border-color .4s,background .4s}
+.card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.28);background:var(--glass-2)}
+.card::after{content:"";position:absolute;inset:-1px;border-radius:inherit;background:radial-gradient(400px circle at var(--mx,50%) var(--my,0%),rgba(255,255,255,.12),transparent 40%);opacity:0;transition:opacity .3s;pointer-events:none}
+.card:hover::after{opacity:1}
+.icon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.04));border:1px solid var(--line);margin-bottom:18px}
+.icon svg{width:24px;height:24px}
+.card h3{margin:0 0 6px;font-size:19px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+
+/* wallpaper marquee */
+.marquee{overflow:hidden;margin-top:44px;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.track{display:flex;gap:18px;width:max-content;animation:scroll 50s linear infinite}
+.track.rev{animation-direction:reverse;margin-top:18px}
+.marquee:hover .track{animation-play-state:paused}
+.track img{width:clamp(230px,28vw,380px);aspect-ratio:16/9;object-fit:cover;border-radius:18px;border:1px solid var(--line)}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:20px}
+@media(max-width:760px){.stats{grid-template-columns:1fr 1fr}}
+.stat{text-align:center;padding:26px 10px;border-radius:22px;background:var(--glass);border:1px solid var(--line)}
+.stat b{display:block;font-size:clamp(36px,5vw,54px);letter-spacing:-.03em;line-height:1}
+.stat span{color:var(--muted);font-size:14px}
+
+/* install */
+.steps{counter-reset:s;list-style:none;padding:0;margin:16px 0 0;display:grid;gap:10px}
+.steps li{counter-increment:s;display:flex;gap:12px;color:#d9dce4;font-size:15px}
+.steps li::before{content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:#fff;color:#0b0d12}
+code{font:500 13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:rgba(255,255,255,.08);padding:2px 7px;border-radius:6px;word-break:break-all}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:rgba(95,227,200,.14);color:var(--a3);margin-bottom:14px}
+
+/* final cta */
+.final{text-align:center;padding:clamp(48px,8vw,90px) 24px;border-radius:36px;background:linear-gradient(140deg,rgba(124,140,255,.22),rgba(255,143,177,.16) 50%,rgba(95,227,200,.16));border:1px solid var(--line);position:relative;overflow:hidden}
+.final::before{content:"";position:absolute;width:140%;aspect-ratio:1;left:-20%;top:-90%;background:conic-gradient(from 0deg,transparent,rgba(255,255,255,.12),transparent 30%);animation:spin 14s linear infinite}
+.final>*{position:relative}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+footer{padding-block:40px calc(40px + env(safe-area-inset-bottom,0px));color:var(--muted);font-size:14px;border-top:1px solid var(--line);margin-top:60px}
+footer .row{display:flex;gap:18px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+footer a:hover{color:var(--ink)}
+
+/* scroll reveal */
+.reveal{opacity:0;transform:translateY(40px) scale(.98);transition:opacity 1s cubic-bezier(.2,.8,.2,1),transform 1s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}.d5{transition-delay:.4s}
+.word{display:inline-block;opacity:0;transform:translateY(.4em);animation:up .8s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes up{to{opacity:1;transform:none}}
+
+/* scroll progress */
+.progress{position:fixed;top:0;left:0;height:3px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--a1),var(--a2),var(--a3));z-index:50}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}.word{opacity:1;transform:none}
+  .tv{transform:none}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<div class="sky"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+<div class="grain"></div>
+
+<nav class="wrap">
+  <div class="bar">
+    <a class="brand" href="#top"><img src="assets/icon.png" alt="">LUMA</a>
+    <div class="links">
+      <a href="#features">Features</a>
+      <a href="#wallpapers">Wallpapers</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/sharmaronit/LUMA">GitHub</a>
+    </div>
+    <a class="btn btn-primary" href="https://github.com/sharmaronit/LUMA/releases/latest/download/luma.apk">Download</a>
+  </div>
+</nav>
+
+<header class="hero wrap" id="top">
+  <span class="eyebrow"><span class="dot"></span>Free · Open source · No ads</span>
+  <h1 id="title">Luma</h1>
+  <p class="lede" id="lede">A calm, fast home screen for Android TV and Google TV. Beautiful depth wallpapers, glass menus and a cleaner that makes old TVs feel new.</p>
+  <div class="cta">
+    <a class="btn btn-primary" href="https://github.com/sharmaronit/LUMA/releases/latest/download/luma.apk">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14"/></svg>Download APK</a>
+    <a class="btn btn-glass" href="#install">How to install</a>
+  </div>
+  <p class="meta">Version 1.0.0 · Android TV 7.1 and newer</p>
+
+  <div class="stage">
+    <div class="tv" id="tv">
+      <div class="screen" id="screen">
+        <img src="assets/home.webp" class="show" alt="Luma home screen with a depth clock behind mountains" data-cap="Home — your favourites and a clock that sits behind the mountains">
+        <img src="assets/quick.webp" alt="Quick settings panel" data-cap="Quick settings — Wi-Fi, sleep timer, StandBy and profiles">
+        <img src="assets/settings.webp" alt="Luma Settings" data-cap="Settings — grouped, glassy and quick to move through">
+        <img src="assets/standby-world.webp" alt="StandBy world clock" data-cap="StandBy — a full-screen clock when the TV is idle">
+        <div class="glare"></div>
+      </div>
+    </div>
+    <div class="stand"></div>
+    <p class="caption" id="caption">Home — your favourites and a clock that sits behind the mountains</p>
+  </div>
+</header>
+
+<main>
+<section id="features" class="wrap">
+  <div class="feature">
+    <div class="shot depth reveal">
+      <img src="assets/wp-dunes.webp" alt="Sand dunes under a starry sky">
+      <div class="live" id="live"><small id="liveDate"></small><span id="liveTime">10:42</span></div>
+    </div>
+    <div class="reveal d2">
+      <span class="kicker">Depth wallpapers</span>
+      <h2>A clock that lives inside the scene.</h2>
+      <p class="sub">Every wallpaper is cut by hand so the time sits behind the peaks, dunes and treelines — placed where each photo has room to breathe.</p>
+      <ul class="ticks">
+        <li>14 real photographs: mountains, beaches, dunes, lakes and aurora</li>
+        <li>Frosted glass digits, drawn once a minute so it never slows the TV</li>
+        <li>Browse full screen with ◀ ▶ and see exactly how Home will look</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="feature flip">
+    <div class="shot reveal"><img src="assets/quick.webp" alt="Quick settings" loading="lazy"></div>
+    <div class="reveal d2">
+      <span class="kicker">Quick settings</span>
+      <h2>Everything important. Nothing extra.</h2>
+      <p class="sub">Select the clock to open a compact glass panel: network, Bluetooth, sound, a sleep timer, wallpapers, StandBy and who's watching.</p>
+      <ul class="ticks">
+        <li>Sleep timer that really turns the TV off</li>
+        <li>Profiles — each person gets their own favourites, wallpaper and font</li>
+        <li>Recent apps: press Home on Home, then ▲ to close an app</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="feature">
+    <div class="shot reveal"><img src="assets/standby-world.webp" alt="StandBy world clock" loading="lazy"></div>
+    <div class="reveal d2">
+      <span class="kicker">StandBy</span>
+      <h2>When the remote rests, the TV becomes a clock.</h2>
+      <p class="sub">After two quiet minutes Luma fades into a full-screen clock. Any button brings you straight back.</p>
+      <div class="shot reveal d3" style="margin-top:26px;border-radius:20px"><img src="assets/standby-picker.webp" alt="StandBy styles" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap center">
+  <span class="kicker reveal">Built for the remote</span>
+  <h2 class="reveal d1">Small touches that add up.</h2>
+  <p class="sub reveal d2">Luma is designed around a D-pad, a slow TV processor and a living room — not a phone.</p>
+  <div class="grid">
+    <div class="card reveal d1"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></div><h3>Clean my TV</h3><p>Switches off ads, tracking and preloaded extras from the TV itself. Nothing is deleted, and one press undoes it.</p></div>
+    <div class="card reveal d2"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div><h3>Fast on cheap boxes</h3><p>Tuned on a 2 GB Mi Box. Lite mode turns heavy effects down automatically on slower TVs.</p></div>
+    <div class="card reveal d3"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8"/></svg></div><h3>Stays awake on Home</h3><p>The screen won't switch off while Luma is showing — StandBy keeps it useful instead.</p></div>
+    <div class="card reveal d1"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><h3>Notifications</h3><p>A small bell appears only when there is something new. Nothing leaves your TV.</p></div>
+    <div class="card reveal d2"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg></div><h3>Profiles</h3><p>Up to six people, each with their own favourites, wallpaper, theme and clock.</p></div>
+    <div class="card reveal d3"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"/></svg></div><h3>Private by design</h3><p>No account, no analytics, no ads. Your layout and settings stay on the TV.</p></div>
+  </div>
+  <div class="stats">
+    <div class="stat reveal d1"><b data-count="14">0</b><span>depth wallpapers</span></div>
+    <div class="stat reveal d2"><b data-count="4">0</b><span>StandBy faces</span></div>
+    <div class="stat reveal d3"><b data-count="0" data-suffix="">0</b><span>ads, ever</span></div>
+    <div class="stat reveal d4"><b data-count="60" data-suffix=" fps">0</b><span>on Home, on a 2 GB box</span></div>
+  </div>
+</section>
+
+<section id="wallpapers">
+  <div class="wrap center">
+    <span class="kicker reveal">Wallpapers</span>
+    <h2 class="reveal d1">Real places. Free to use.</h2>
+    <p class="sub reveal d2">Every photo is public-domain (CC0) and credited in the app.</p>
+  </div>
+  <div class="marquee reveal d2">
+    <div class="track" id="trackA"></div>
+    <div class="track rev" id="trackB"></div>
+  </div>
+</section>
+
+<section id="install" class="wrap">
+  <div class="center">
+    <span class="kicker reveal">Install</span>
+    <h2 class="reveal d1">Three ways in. Pick yours.</h2>
+    <p class="sub reveal d2">All three install Luma and can switch off the bloatware that slows your TV down.</p>
+  </div>
+  <div class="grid">
+    <div class="card reveal d1">
+      <span class="tag">Easiest</span>
+      <h3>On the TV only</h3>
+      <ol class="steps">
+        <li>Install <b>Downloader</b> from the Play Store.</li>
+        <li>Open it and enter <code>github.com/sharmaronit/LUMA/releases/latest/download/luma.apk</code></li>
+        <li>Install, open Luma and choose it as your Home app.</li>
+        <li>Optional: Settings › Device › <b>Clean my TV</b>.</li>
+      </ol>
+    </div>
+    <div class="card reveal d2">
+      <span class="tag">Works on every TV</span>
+      <h3>With a computer</h3>
+      <ol class="steps">
+        <li>Turn on USB debugging on the TV.</li>
+        <li>Download <a href="https://github.com/sharmaronit/LUMA/releases/latest/download/luma.apk"><u>luma.apk</u></a> and run <code>adb install luma.apk</code></li>
+        <li>Run the debloat script from the repo: <code>scripts/debloat</code></li>
+      </ol>
+    </div>
+    <div class="card reveal d3">
+      <span class="tag">Hands-off</span>
+      <h3>With an AI assistant</h3>
+      <ol class="steps">
+        <li>Turn on USB debugging on the TV.</li>
+        <li>Open Claude Code, Codex or a similar assistant.</li>
+        <li>Paste <a href="https://github.com/sharmaronit/LUMA/blob/main/PROMPT.md"><u>PROMPT.md</u></a> and answer its questions.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="final reveal">
+    <h2>Make your TV feel new.</h2>
+    <p class="sub" style="margin:0 auto 28px">Free forever. Open source. Built by one person who wanted a calmer living room.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/sharmaronit/LUMA/releases/latest/download/luma.apk">Download Luma 1.0</a>
+      <a class="btn btn-glass" href="https://github.com/sharmaronit/LUMA">Star on GitHub</a>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="wrap">
+  <div class="row">
+    <span>Luma · Created by Ronit Sharma</span>
+    <span>
+      <a href="https://github.com/sharmaronit/LUMA">Source</a> ·
+      <a href="https://github.com/sharmaronit/LUMA/blob/main/PRIVACY.md">Privacy</a> ·
+      <a href="https://github.com/sharmaronit/LUMA/blob/main/NOTICE">Licences &amp; credits</a> · GPL-3.0
+    </span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Headline words rise in one after another.
+  const lede = document.getElementById('lede');
+  if (!reduce) {
+    lede.innerHTML = lede.textContent.split(' ').map((w, i) =>
+      `<span class="word" style="animation-delay:${.25 + i * .035}s">${w}</span>`).join(' ');
+  }
+
+  // TV straightens up on load, then tilts gently with the pointer on desktop.
+  const tv = document.getElementById('tv');
+  requestAnimationFrame(() => setTimeout(() => tv.classList.add('on'), 150));
+  if (!reduce && matchMedia('(pointer:fine)').matches) {
+    addEventListener('pointermove', e => {
+      const x = e.clientX / innerWidth - .5, y = e.clientY / innerHeight - .5;
+      tv.style.transform = `rotateX(${(-y * 6).toFixed(2)}deg) rotateY(${(x * 8).toFixed(2)}deg)`;
+    }, { passive: true });
+  }
+
+  // Screenshots cross-fade on the TV.
+  const shots = [...document.querySelectorAll('#screen img')], cap = document.getElementById('caption');
+  let n = 0;
+  setInterval(() => {
+    shots[n].classList.remove('show');
+    n = (n + 1) % shots.length;
+    shots[n].classList.add('show');
+    cap.style.opacity = 0;
+    setTimeout(() => { cap.textContent = shots[n].dataset.cap; cap.style.opacity = 1; }, 300);
+  }, 4200);
+
+  // Live clock on the depth demo.
+  const t = document.getElementById('liveTime'), d = document.getElementById('liveDate');
+  const tick = () => {
+    const now = new Date();
+    t.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    d.textContent = now.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' });
+  };
+  tick(); setInterval(tick, 15000);
+
+  // Wallpaper marquee: each row holds the set twice for a seamless loop.
+  const walls = ['aoraki','dunes','lighthouse','aurora','lake','shore','volcano','dolomites','misty','rose'];
+  const fill = (el, list) => el.innerHTML = [...list, ...list].map(w =>
+    `<img src="assets/wp-${w}.webp" alt="" loading="lazy">`).join('');
+  fill(document.getElementById('trackA'), walls.slice(0, 5));
+  fill(document.getElementById('trackB'), walls.slice(5));
+
+  // Reveal on scroll, and count the stats up once.
+  const count = el => {
+    const end = +el.dataset.count, suffix = el.dataset.suffix || '', start = performance.now();
+    const step = now => {
+      const p = Math.min(1, (now - start) / 1400), v = Math.round(end * (1 - Math.pow(1 - p, 3)));
+      el.textContent = v + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    };
+    reduce ? el.textContent = end + suffix : requestAnimationFrame(step);
+  };
+  const io = new IntersectionObserver(entries => entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('in');
+    e.target.querySelectorAll?.('[data-count]').forEach(count);
+    if (e.target.dataset.count) count(e.target);
+    io.unobserve(e.target);
+  }), { threshold: .15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Cards light up where the pointer is.
+  document.querySelectorAll('.card').forEach(c => c.addEventListener('pointermove', e => {
+    const r = c.getBoundingClientRect();
+    c.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    c.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  }));
+
+  // Reading progress bar.
+  const bar = document.getElementById('progress');
+  addEventListener('scroll', () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+  }, { passive: true });
+})();
+</script>
+</body>
+</html>

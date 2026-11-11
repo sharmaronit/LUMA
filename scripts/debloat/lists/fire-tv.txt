@@ -1,0 +1,30 @@
+# Luma debloat list: Amazon Fire TV (Fire OS).
+# On Fire OS 7.6 and later the Amazon launcher cannot be disabled without root;
+# the script will report a FAIL for it, which is harmless.
+# Format: tier|package|description
+
+never|com.amazon.tv.settings|Fire TV settings
+never|com.amazon.tv.settings.v2|Fire TV settings
+never|com.amazon.tv.oobe|Fire TV setup
+never|com.amazon.venezia|Amazon Appstore (needed for app installs)
+never|com.amazon.tv.ime|Fire TV keyboard
+never|com.amazon.device.sync|Amazon account sync
+
+safe|com.amazon.device.crashmanager|Crash reporting
+safe|com.amazon.client.metrics|Usage metrics
+safe|com.amazon.client.metrics.api|Usage metrics API
+safe|com.amazon.dp.logger|Device logger
+safe|com.amazon.ags.app|Amazon GameCircle
+safe|com.amazon.bueller.music|Amazon Music
+safe|com.amazon.bueller.photos|Amazon Photos
+safe|com.amazon.imdb.tv.android.app|Freevee
+safe|com.amazon.tv.legal.notices|Legal notices viewer
+
+aggressive|com.amazon.avod.thirdpartyclient|Prime Video
+aggressive|com.amazon.vizzini|Alexa voice
+aggressive|com.amazon.tv.livetv|Live TV tab
+aggressive|com.amazon.ftv.screensaver|Amazon screensaver
+aggressive|com.amazon.tv.forcedotaupdater.v2|Forced OTA updater
+aggressive|com.amazon.device.software.ota|System updates
+
+launcher|com.amazon.tv.launcher|Fire TV home

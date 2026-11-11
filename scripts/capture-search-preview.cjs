@@ -1,0 +1,32 @@
+const fs = require('node:fs');
+const path = require('node:path');
+(async () => {
+  const tabs = await (await fetch('http://127.0.0.1:9223/json')).json();
+  const tab = tabs.find(t => t.type === 'page' && t.url.startsWith('http://127.0.0.1:4174'));
+  if (!tab) throw Error('Local preview tab missing');
+  const socket = new WebSocket(tab.webSocketDebuggerUrl);
+  await new Promise(r => socket.addEventListener('open', r, {once: true}));
+  let id = 0; const pending = new Map();
+  socket.onmessage = event => { const m = JSON.parse(event.data); if (m.id) { pending.get(m.id)?.(m); pending.delete(m.id); } };
+  const send = (method, params = {}) => new Promise(r => { pending.set(++id, r); socket.send(JSON.stringify({id, method, params})); });
+  const pause = ms => new Promise(r => setTimeout(r, ms));
+  const click = async (x, y) => {
+    await send('Input.dispatchMouseEvent', {type:'mousePressed', x,y,button:'left',clickCount:1});
+    await send('Input.dispatchMouseEvent', {type:'mouseReleased',x,y,button:'left',clickCount:1});
+    await pause(700);
+  };
+  const shot = async name => { const r = await send('Page.captureScreenshot',{format:'png'}); fs.writeFileSync(path.resolve(__dirname, '../../artifacts', `${name}.png`), Buffer.from(r.result.data,'base64')); };
+  await send('Emulation.setDeviceMetricsOverride',{width:1600,height:900,deviceScaleFactor:1,mobile:false});
+  await send('Runtime.evaluate',{expression:`localStorage.setItem('flutter.minimal_background',JSON.stringify('glass'));localStorage.setItem('flutter.home_clock_style',JSON.stringify('analog'));localStorage.setItem('flutter.home_clock_size',JSON.stringify('large'));localStorage.setItem('flutter.home_remember_selection','false');`});
+  await send('Page.reload',{ignoreCache:true}); await pause(15000);
+  await shot('luma-analog-clock');
+  await click(70,38); await shot('luma-floating-search');
+  await send('Input.insertText',{text:'Wednesday'}); await pause(600); await shot('luma-search-show-results');
+  await click(1175,178);
+  await click(124,38); await pause(500); await shot('luma-voice-listening');
+  await pause(4500); await shot('luma-voice-results');
+  await click(1175,178);
+  await send('Runtime.evaluate',{expression:`localStorage.setItem('flutter.home_clock_style',JSON.stringify('digital'));`});
+  await send('Page.reload',{ignoreCache:true}); await pause(10000); await shot('luma-digital-clock-large');
+  socket.close();
+})().catch(error => { console.error(error); process.exit(1); });

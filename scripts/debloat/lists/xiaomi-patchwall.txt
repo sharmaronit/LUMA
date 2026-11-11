@@ -1,0 +1,30 @@
+# Luma debloat list: Xiaomi Mi TV / Mi TV Stick with PatchWall.
+# Format: tier|package|description
+
+
+safe|com.miui.tv.analytics|Xiaomi analytics
+safe|com.xiaomi.mitv.analytics|Xiaomi analytics
+safe|com.xiaomi.mitv.advertise|Xiaomi ads
+safe|com.xiaomi.mitv.tvpush.tvpushservice|Xiaomi push promotions
+safe|com.mitv.videoplayer|Mi video player
+
+aggressive|com.xiaomi.mitv.upgrade|Xiaomi system updates
+aggressive|com.xiaomi.mitv.appstore|Mi app store
+
+launcher|com.mitv.tvhome|PatchWall home
+launcher|com.mitv.tvhome.atv|PatchWall home (Android TV)
+
+# Verified on Xiaomi Mi Box 4 (MIBOX4, Android 12 / SDK 31)
+never|mitv.service|Xiaomi core TV service
+never|com.mi.bluetooth|Mi remote Bluetooth service
+never|com.xiaomi.gtv.settings|Xiaomi settings
+never|com.xiaomi.tvqs.overseas|Xiaomi quick settings panel
+never|com.xiaomi.android.tvsetup.partnercustomizer|Xiaomi setup customizer
+never|com.droidlogic|Amlogic platform service
+safe|com.xiaomi.statistic|Xiaomi usage statistics (telemetry)
+safe|com.mitv.tvhome.mitvplus|Mi TV+ ad-supported channels
+safe|com.mitv.tvhome.michannel|PatchWall channel promos
+safe|com.xiaomo.tv.milegal|Xiaomi legal notices viewer
+aggressive|com.xiaomi.mitv.updateservice|Xiaomi system updates
+aggressive|com.mitv.dream|Mi screensaver
+aggressive|com.mitv.milinkservice|Mi cast / screen mirroring

@@ -1,0 +1,9 @@
+# Luma debloat list: Google TV (Chromecast with Google TV, Google TV Streamer,
+# Sony / TCL / Hisense Google TV sets).  Format: tier|package|description
+
+
+safe|com.google.android.apps.tv.dreamx|Google TV ambient mode (ads and promos)
+safe|com.google.android.apps.youtube.kids.tv|YouTube Kids (preinstalled)
+
+
+launcher|com.google.android.apps.tv.launcherx|Google TV home screen

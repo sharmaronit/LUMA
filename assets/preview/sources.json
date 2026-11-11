@@ -1,0 +1,98 @@
+[
+  {
+    "slug": "youtube",
+    "name": "YouTube",
+    "package": "com.google.android.youtube.tv",
+    "source": "https://play.google.com/store/apps/details?id=com.google.android.youtube.tv&hl=en&gl=IN",
+    "image": "https://play-lh.googleusercontent.com/OzCC2CEwKggMTTeFt_uAZ4Hp9W6b5_cGy29Pk36V-gAgh_w2ldR_2dVzo4B-7nClDUxo_mvkMG6LJ9o--ccvIw=s0-br30",
+    "bytes": 9979
+  },
+  {
+    "slug": "netflix",
+    "name": "Netflix",
+    "package": "com.netflix.ninja",
+    "source": "https://play.google.com/store/apps/details?id=com.netflix.ninja&hl=en&gl=IN",
+    "image": "https://play-lh.googleusercontent.com/ndMigyoaH5k4aZ5GyIHj5ZNXEJQ_YTkcCByrX-m-IZE1xGJYfQZ9Hr3u1rFDK3EByo4VcDtBohg0Aqp3d3SW0Jo=s0-br30",
+    "bytes": 12678
+  },
+  {
+    "slug": "jiohotstar",
+    "name": "JioHotstar",
+    "package": "in.startv.hotstar",
+    "source": "https://play.google.com/store/apps/details?id=in.startv.hotstar&hl=en&gl=IN",
+    "image": "https://play-lh.googleusercontent.com/02xiO0ptbXjD8NR3sbS2StP1P9aytDN56dDR15zqM_i66Vwq5W_hD-98CoFxvRVoUS4uV_xMSv-iQh3nQFeDeQ=s0-br30",
+    "bytes": 123078
+  },
+  {
+    "slug": "primevideo",
+    "name": "Prime Video",
+    "package": "com.amazon.amazonvideo.livingroom",
+    "source": "https://play.google.com/store/apps/details?id=com.amazon.amazonvideo.livingroom&hl=en&gl=IN",
+    "image": "https://play-lh.googleusercontent.com/qyXqjzPggunbifX0ODhCehdy4ei0F90u0N3f4pPk8NhgCZD75dH8bdQYPROGRVlTVOs8B8JAT58X6ImMZv5ugHg=s0-br30",
+    "bytes": 7094
+  },
+  {
+    "slug": "sonyliv",
+    "name": "Sony LIV",
+    "package": "com.sonyliv",
+    "source": "https://play.google.com/store/apps/details?id=com.sonyliv&hl=en&gl=IN",
+    "image": "https://play-lh.googleusercontent.com/OSPwLdQHHx16DNvMT8GxkBvpzj5x9WG9_DmJoTMS1YKKbg1YsQlfzTLzc-XTkCLaF9FT7-I-kX9RvSUxSAwYRA=s0-br30",
+    "bytes": 117718
+  },
+  {
+    "slug": "zee5",
+    "name": "ZEE5",
+    "package": "com.graymatrix.did",
+    "source": "https://play.google.com/store/apps/details?id=com.graymatrix.did&hl=en&gl=IN",
+    "image": "https://play-lh.googleusercontent.com/NyMT3ByjkBG1FhdFX9GSj_0mXLNIAuz_IZO8Xr9Noow6D4IQs-Srai9Hklad5gDasSv6F5tHYwsquk1mXErQ5A=s0-br30",
+    "bytes": 14888
+  },
+  {
+    "slug": "jiotv",
+    "name": "JioTV+",
+    "package": "com.jio.media.jiotvplus",
+    "source": "https://play.google.com/store/apps/details?id=com.jio.media.jiotvplus&hl=en&gl=IN",
+    "image": "https://play-lh.googleusercontent.com/YzCDPantLFE3sw1tmkOcxSKORt_uACVBpfSprVjyx0FR4arX3O3EUbrSJ0t_7MukyOQMylBxu1W8kD2doyDh=s0-br30",
+    "bytes": 100383
+  },
+  {
+    "slug": "spotify",
+    "name": "Spotify",
+    "package": "com.spotify.tv.android",
+    "source": "https://play.google.com/store/apps/details?id=com.spotify.tv.android&hl=en&gl=IN",
+    "image": "https://play-lh.googleusercontent.com/7ghCqs4kKYrQpTECddnejlSeAXgpdiiKlIghuDR869MpF5msXdPsd3gqjC6lstD_NfJkmP0LAUJTty7UACcrLw=s0-br30",
+    "bytes": 16182
+  },
+  {
+    "slug": "plex",
+    "name": "Plex",
+    "package": "com.plexapp.android",
+    "source": "https://play.google.com/store/apps/details?id=com.plexapp.android&hl=en&gl=IN",
+    "image": "https://play-lh.googleusercontent.com/0-rSvTIYVEveysANiSS5FITkkD-kpe6TG91nJRy7ht2J0BHlPWXiGaMcDRYUOwTVuZsE4-HyI-qSL0KkNEvQ=s0-br30",
+    "bytes": 69814
+  },
+  {
+    "slug": "vlc",
+    "name": "VLC",
+    "package": "org.videolan.vlc",
+    "source": "https://play.google.com/store/apps/details?id=org.videolan.vlc&hl=en&gl=IN",
+    "image": "https://play-lh.googleusercontent.com/BG5YwziGHjh0wvWg6VO9c3iprYa3vFww1CnNqPvFszUVxcY4yB29dy7t2jsLwwI4jAqX08_--12FmMxgNG1JFg=s0-br30",
+    "bytes": 16612
+  },
+  {
+    "slug": "crunchyroll",
+    "name": "Crunchyroll",
+    "package": "com.crunchyroll.crunchyroid",
+    "source": "https://play.google.com/store/apps/details?id=com.crunchyroll.crunchyroid&hl=en&gl=IN",
+    "image": "https://play-lh.googleusercontent.com/FUEOotGzxEZqItvGGov0YBiOhZBCACxCM6kF37OtpWrCG9H6EyxSeY2G8PDXQGueLxlxtL3Xr0fbkvXaQ67NLg=s0-br30",
+    "bytes": 23253
+  },
+  {
+    "slug": "apple-tv",
+    "name": "Apple TV",
+    "package": "com.apple.atve.androidtv.appletv",
+    "source": "https://play.google.com/store/apps/details?id=com.apple.atve.androidtv.appletv&hl=en&gl=IN",
+    "image": "https://play-lh.googleusercontent.com/OClJIvZt6akgvt1v9AZf5C0RHtanBLtxtEKPMO-iU0UQgOIaKqSf_efqSi06H8dRNVVAz1y9rMX8TUugdpSI9A=s0-br30",
+    "bytes": 57450
+  }
+]

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="theme-color" content="#172638">
+  <meta name="description" content="Android TV launcher Flutter design preview">
+  <meta name="luma-preview-design" content="restored-glass-home-20261019">
+  <title>Luma · Restored glass preview</title>
+  <style>html,body{margin:0;background:#172638;height:100%;}#loading{position:absolute;inset:0;display:grid;place-items:center;color:#f4f7fb;font:18px system-ui}</style>
+</head>
+<body>
+  <div id="loading">Loading Luma…</div>
+  <script>
+    window.addEventListener('flutter-first-frame',()=>document.getElementById('loading')?.remove());
+    // The remote Menu key opens app options; keep the browser menu out of the way.
+    document.addEventListener('contextmenu', event => event.preventDefault());
+  </script>
+  <script src="preview-refresh.js?design=restored-glass-home-20261019" defer></script>
+  <script src="flutter_bootstrap.js?design=restored-glass-home-20261019" async></script>
+</body>
+</html>

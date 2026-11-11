@@ -1,0 +1,10 @@
+Minimal Android TV Icons
+
+Source: https://github.com/Mortisshadow/minimal-tv-icons
+Author: Mortisshadow. License: MIT (included in LICENSE).
+Commit: e087672b761653be6385284fe618585736502f27
+
+These 46 unmodified PNGs are the soft 1280×720 variant. Only filename casing was
+normalised. Service logos and trademarks remain the property of their owners.
+Luma selects a matching image by package name or exact app name. Apps outside
+the pack keep their original TV banner/icon. No APK icon-pack installer is used.

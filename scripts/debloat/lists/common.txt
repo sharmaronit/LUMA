@@ -1,0 +1,53 @@
+# Luma debloat list: common to all Android TV / Google TV devices.
+# Format: tier|package|description
+#   safe        - ads, telemetry, demos, rarely used content apps (default run)
+#   aggressive  - useful to some users; only removed with -Aggressive
+#   launcher    - stock home screens; only removed with -DisableStockLauncher
+#   never       - protected; the script refuses to touch these
+# Packages that are not installed on the device are skipped automatically.
+
+never|android|Android system
+never|com.android.systemui|System UI
+never|com.android.shell|ADB shell
+never|com.android.settings|Settings
+never|com.android.tv.settings|Android TV settings
+never|com.android.providers.settings|Settings storage
+never|com.android.providers.tv|TV provider (channels / Watch Next)
+never|com.android.bluetooth|Bluetooth (remote pairing)
+never|com.android.packageinstaller|Package installer
+never|com.google.android.packageinstaller|Package installer
+never|com.google.android.gms|Google Play services
+never|com.google.android.gsf|Google services framework
+never|com.android.vending|Google Play Store
+never|com.google.android.tv.remote.service|Remote control service
+never|com.google.android.leanback.ime|Gboard for TV (on-screen keyboard)
+never|com.android.inputmethod.latin|Keyboard
+never|com.google.android.webview|Android System WebView
+never|com.android.webview|Android System WebView
+never|com.google.android.tungsten.setupwraith|Device setup
+
+safe|com.google.android.feedback|Google feedback reporter
+safe|com.google.android.tvtutorials|TV tutorials
+safe|com.google.android.play.games|Google Play Games
+safe|com.google.android.videos|Google TV / Play Movies
+safe|com.google.android.music|Google Play Music (discontinued)
+safe|com.android.providers.partnerbookmarks|Partner bookmarks
+safe|com.google.android.tv.bugreportsender|Bug report sender
+safe|com.google.android.partnersetup|Partner setup / promos
+
+aggressive|com.google.android.youtube.tvmusic|YouTube Music
+aggressive|com.google.android.katniss|Google app for TV (voice search, Assistant)
+aggressive|com.google.android.backdrop|Ambient mode (Backdrop)
+aggressive|com.android.dreams.basic|Basic screensaver
+aggressive|com.google.android.tvrecommendations|Android TV recommendations service
+never|com.google.android.inputmethod.latin|Gboard
+never|com.google.android.marvin.talkback|TalkBack (accessibility)
+never|com.google.android.tts|Text-to-speech (needed by TalkBack)
+never|com.google.android.permissioncontroller|Permission controller
+never|com.google.android.ext.services|Android ext services
+never|com.android.providers.media|Media storage
+never|com.android.providers.media.module|Media storage
+never|com.android.providers.downloads|Download manager
+safe|com.android.printspooler|Print spooler (no printing on TV)
+aggressive|com.amazon.amazonvideo.livingroom|Prime Video (preinstalled)
+aggressive|com.google.android.apps.mediashell|Chromecast built-in (disables casting)
