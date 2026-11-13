@@ -407,7 +407,7 @@ footer a:hover{color:#fff}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14"/></svg>Download APK</a>
     <a class="btn btn-ghost" href="#install">How to install</a>
   </div>
-  <p class="meta" data-hero-copy>Version 1.0.0 · Android 7.1 and newer · No account, no ads</p>
+  <p class="meta" data-hero-copy>Version 1.0.1 · Android 7.1 and newer · No account, no ads</p>
 
   <div class="showcase" id="showcase">
     <div class="tv" id="tv">
@@ -591,7 +591,7 @@ footer a:hover{color:#fff}
   </div>
   <div class="chart install-chart" data-up>
     <h3>Which download should I pick?</h3>
-    <p class="desc">File sizes on the 1.0.0 release. The universal APK works on every TV; the smaller ones fit one processor type.</p>
+    <p class="desc">File sizes on the 1.0.1 release. The universal APK works on every TV; the smaller ones fit one processor type.</p>
     <div class="hbars" id="sizes"></div>
   </div>
 </section>
@@ -753,7 +753,7 @@ function countUp(node) {
   requestAnimationFrame(step);
 }
 
-/* ---------- data: docs/mibox-performance.md, scripts/debloat/lists and the v1.0.0 release ---------- */
+/* ---------- data: docs/mibox-performance.md, scripts/debloat/lists and the v1.0.1 release ---------- */
 const frames = [
   ['First beta', 'Beta', 35.5, 99.4], ['Isolate glass', 'Glass', 30.6, 97.8], ['Prepare wallpaper', 'Wallpaper', 16.7, 49.9],
   ['Cache panels', 'Panels', 12.2, 17.4], ['Less clipping', 'Clipping', 11.5, 8.7], ['Release build', 'Release', 5.4, 0.52],
@@ -765,7 +765,7 @@ const tiers = [
   ['Protected', 'Never touched', 39, '--c3'],
 ];
 const families = [['All TVs', 43], ['Fire TV', 22], ['Xiaomi PatchWall', 22], ['Android TV boxes', 10], ['Google TV', 3]];
-const sizes = [['luma.apk (universal)', 78.9], ['arm64-v8a (newer TVs)', 36.5], ['armeabi-v7a (older TVs)', 34.2]];
+const sizes = [['luma.apk (universal)', 57.2], ['arm64-v8a (newer TVs)', 36.4], ['armeabi-v7a (older TVs)', 34.1]];
 $('#t-frames').innerHTML = '<tr><th>Step</th><th>Median</th></tr>' + frames.map(f => `<tr><td>${f[0]}</td><td>${f[2]} ms</td></tr>`).join('');
 $('#t-miss').innerHTML = '<tr><th>Step</th><th>Missed</th></tr>' + frames.map(f => `<tr><td>${f[0]}</td><td>${f[3]}%</td></tr>`).join('');
 
@@ -919,7 +919,7 @@ function buildCharts() {
 buildCharts();
 register($('#donut'), donut());
 register($('#families'), hbars($('#families'), families, '--c1', '', 43));
-register($('#sizes'), hbars($('#sizes'), sizes, '--c3', ' MB', 80));
+register($('#sizes'), hbars($('#sizes'), sizes, '--c3', ' MB', 60));
 $$('[data-count]').forEach(n => io.observe(n));
 let rt, lastW = innerWidth;
 addEventListener('resize', () => {
