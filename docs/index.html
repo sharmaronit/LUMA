@@ -8,8 +8,9 @@
 <meta name="theme-color" content="#0b0b0d">
 <meta property="og:title" content="Luma — a calm home screen for your TV">
 <meta property="og:description" content="Free and open source. No ads. Depth wallpapers, StandBy and Clean my TV.">
-<meta property="og:image" content="assets/home.webp">
-<link rel="icon" href="assets/icon.png">
+<meta property="og:image" content="assets/og.png">
+<link rel="icon" href="assets/luma-mark.svg" type="image/svg+xml">
+<link rel="alternate icon" href="assets/icon.png">
 <link rel="apple-touch-icon" href="assets/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,7 +59,7 @@ code.url{white-space:normal;word-break:break-all}
 .pre-in{position:relative;display:flex;flex-direction:column;align-items:center;gap:18px}
 .pre-logo{width:76px;height:76px;border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.1)}
 .pre-mask{overflow:hidden;padding:0 4px}
-.pre-word{display:block;font-weight:700;letter-spacing:.5em;margin-right:-.5em;font-size:15px;background:var(--silver);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pre-word{display:block;font-weight:600;letter-spacing:-.02em;font-size:30px;background:var(--silver);-webkit-background-clip:text;background-clip:text;color:transparent}
 .pre-bar{width:120px;height:1px;background:rgba(255,255,255,.1);overflow:hidden}
 .pre-bar i{display:block;height:100%;background:#fff;transform-origin:left;transform:scaleX(0)}
 
@@ -84,7 +85,7 @@ code.url{white-space:normal;word-break:break-all}
   background:linear-gradient(115deg,rgba(255,255,255,.2) 0%,transparent 30%,transparent 70%,rgba(255,255,255,.1) 100%);mix-blend-mode:screen}
 .nav.compact{width:min(1000px,calc(100% - 32px));background:linear-gradient(180deg,rgba(40,40,44,.7),rgba(18,18,20,.6))}
 .nav.away{transform:translate(-50%,calc(-100% - 30px))}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.22em;font-size:14px;margin-right:auto;white-space:nowrap}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:-.02em;font-size:19px;margin-right:auto;white-space:nowrap}
 .brand img{width:28px;height:28px;border-radius:8px;transition:transform .6s var(--spring)}
 .brand:hover img{transform:rotate(-10deg) scale(1.1)}
 .links{position:relative;display:flex;gap:2px}
@@ -148,8 +149,8 @@ h2 em{font-style:italic;font-weight:500}
 .logo-mark .float{display:block}
 .logo-mark img{width:100%;aspect-ratio:1;border-radius:28%;position:relative;z-index:1;
   box-shadow:0 0 0 1px rgba(255,255,255,.14),inset 0 1px 0 rgba(255,255,255,.3),0 24px 60px -12px rgba(0,0,0,.9)}
-.logo-mark::before{content:"";position:absolute;inset:-30%;border-radius:50%;z-index:0;filter:blur(30px);opacity:.45;
-  background:conic-gradient(from 200deg,#c13f86,#4a3fd0,#1594c4,#c13f86);animation:spin 14s linear infinite}
+.logo-mark::before{content:"";position:absolute;inset:-26%;border-radius:50%;z-index:0;filter:blur(32px);opacity:.28;
+  background:conic-gradient(from 200deg,#ffffff,#55555c,#d9d9de,#3a3a40,#ffffff);animation:spin 14s linear infinite}
 .logo-mark::after{content:"";position:absolute;inset:0;border-radius:28%;z-index:2;pointer-events:none;
   background:linear-gradient(130deg,rgba(255,255,255,.35),transparent 40%)}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -353,8 +354,8 @@ footer a:hover{color:#fff}
 <div class="pre" id="pre" aria-hidden="true">
   <div class="pre-l"></div><div class="pre-r"></div>
   <div class="pre-in">
-    <img class="pre-logo" src="assets/icon.png" alt="">
-    <div class="pre-mask"><span class="pre-word">LUMA</span></div>
+    <img class="pre-logo" src="assets/luma-mark.svg" alt="">
+    <div class="pre-mask"><span class="pre-word">Luma</span></div>
     <div class="pre-bar"><i></i></div>
   </div>
 </div>
@@ -363,7 +364,7 @@ footer a:hover{color:#fff}
 <div class="tip" id="tip" role="status"></div>
 
 <nav class="nav" id="nav" aria-label="Main">
-  <a class="brand" href="#top"><img src="assets/icon.png" alt="">LUMA</a>
+  <a class="brand" href="#top"><img src="assets/luma-mark.svg" alt=""><span class="silver">Luma</span></a>
   <div class="links" id="links">
     <span class="pill" id="pill"></span>
     <a href="#features">Features</a>
@@ -393,7 +394,7 @@ footer a:hover{color:#fff}
 <!-- HERO -->
 <header class="hero wrap" id="hero">
   <span class="orb o1" data-speed="0.6"></span><span class="orb o2 float" data-speed="1.4"></span><span class="orb o3" data-speed="0.3"></span>
-  <div class="logo-mark" data-hero-logo><span class="float"><img src="assets/icon.png" alt="Luma logo"></span></div>
+  <div class="logo-mark" data-hero-logo><span class="float"><img src="assets/luma-mark.svg" alt="Luma logo"></span></div>
   <span class="badge" data-hero-copy><i>1.0</i>Free and open source · Android TV and Google TV</span>
   <div class="title-wrap">
     <h1 aria-label="Luma"><span class="ch">L</span><span class="ch">u</span><span class="ch">m</span><span class="ch">a</span></h1>
@@ -611,7 +612,7 @@ footer a:hover{color:#fff}
 
 <footer>
   <div class="wrap">
-    <span class="foot-brand"><img src="assets/icon.png" alt="">Luma · Created by Ronit Sharma</span>
+    <span class="foot-brand"><img src="assets/luma-mark.svg" alt="">Luma · Created by Ronit Sharma</span>
     <span><a href="https://github.com/sharmaronit/LUMA">Source</a> · <a href="https://github.com/sharmaronit/LUMA/blob/main/PRIVACY.md">Privacy</a> · <a href="https://github.com/sharmaronit/LUMA/blob/main/NOTICE">Licences &amp; credits</a> · GPL-3.0</span>
   </div>
 </footer>
