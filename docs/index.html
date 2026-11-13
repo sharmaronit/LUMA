@@ -5,435 +5,1063 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Luma — a calm home screen for your TV</title>
 <meta name="description" content="Luma is a free, fast, ad-free home screen for Android TV and Google TV, with depth wallpapers, StandBy clocks and a built-in cleaner.">
-<meta name="theme-color" content="#07080c">
+<meta name="theme-color" content="#0b0b0d">
 <meta property="og:title" content="Luma — a calm home screen for your TV">
 <meta property="og:description" content="Free and open source. No ads. Depth wallpapers, StandBy and Clean my TV.">
 <meta property="og:image" content="assets/home.webp">
 <link rel="icon" href="assets/icon.png">
+<link rel="apple-touch-icon" href="assets/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Antonio:wght@200;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,500&display=swap" rel="stylesheet">
+<script>
+  // Animated mode: content starts hidden and GSAP brings it in. If the
+  // libraries fail to load, everything is shown as plain static content.
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.classList.add('js');
+    setTimeout(() => { if (!window.__lumaReady) document.documentElement.classList.remove('js'); }, 4000);
+  }
+</script>
 <style>
 :root{
-  --bg:#07080c; --ink:#f4f5f8; --muted:#a3a8b6; --line:rgba(255,255,255,.12);
-  --glass:rgba(255,255,255,.06); --glass-2:rgba(255,255,255,.1);
-  --a1:#7c8cff; --a2:#ff8fb1; --a3:#5fe3c8; --a4:#ffb36b;
-  --radius:28px; --gutter:clamp(18px,5vw,64px);
+  color-scheme:dark;
+  --bg:#0b0b0d; --panel:#151518; --panel-2:#1b1b1f;
+  --line:rgba(255,255,255,.08); --line-2:rgba(255,255,255,.14);
+  --text:#f2f2f4; --text-2:#b4b4ba; --muted:#7d7d85;
+  --silver:linear-gradient(180deg,#ffffff 0%,#d9d9de 45%,#8e8e96 100%);
+  /* chart colours, checked for colour blindness and contrast on the charcoal surface */
+  --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; --budget:#9a9aa2;
+  --expo:cubic-bezier(.16,1,.3,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+  --font:"Montserrat",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+html{scroll-behavior:smooth;scroll-padding-top:96px}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:clip}
 img{max-width:100%;display:block}
 a{color:inherit;text-decoration:none}
-.wrap{max-width:1200px;margin:0 auto;padding-inline:var(--gutter)}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.86em;background:rgba(255,255,255,.06);border:1px solid var(--line);padding:1px 6px;border-radius:6px;white-space:nowrap}
+code.url{white-space:normal;word-break:break-all}
+::selection{background:#e8e8ec;color:#0b0b0d}
 
-/* ---------- moving aurora background ---------- */
-.sky{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
-.blob{position:absolute;width:60vmax;height:60vmax;border-radius:50%;filter:blur(80px);opacity:.42;will-change:transform}
-.b1{background:radial-gradient(circle,var(--a1),transparent 60%);top:-20vmax;left:-15vmax;animation:drift1 22s ease-in-out infinite alternate}
-.b2{background:radial-gradient(circle,var(--a2),transparent 60%);top:10vmax;right:-25vmax;animation:drift2 26s ease-in-out infinite alternate}
-.b3{background:radial-gradient(circle,var(--a3),transparent 60%);bottom:-30vmax;left:20vmax;animation:drift3 30s ease-in-out infinite alternate;opacity:.28}
-@keyframes drift1{to{transform:translate(18vmax,12vmax) scale(1.15)}}
-@keyframes drift2{to{transform:translate(-20vmax,16vmax) scale(.9)}}
-@keyframes drift3{to{transform:translate(-14vmax,-18vmax) scale(1.2)}}
-.grain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.06;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+/* hidden until animated in (only when animation is on) */
+.js [data-hero-logo],.js [data-hero-copy],.js .hero h1,.js .showcase,.js [data-up],.js [data-split],.js [data-mask],.js [data-pop]{visibility:hidden}
 
-/* ---------- nav ---------- */
-nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;padding-block:14px}
-.bar{display:flex;align-items:center;gap:18px;padding:10px 12px 10px 18px;border-radius:999px;background:rgba(14,16,22,.55);border:1px solid var(--line);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4)}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.18em;font-size:15px}
-.brand img{width:28px;height:28px;border-radius:8px}
-.links{display:flex;gap:22px;margin-left:auto;font-size:14px;color:var(--muted)}
-.links a:hover{color:var(--ink)}
-.btn{display:inline-flex;align-items:center;gap:10px;padding:12px 22px;border-radius:999px;font-weight:600;font-size:15px;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s,background .25s}
-.btn:hover{transform:translateY(-2px) scale(1.03)}
-.btn-primary{background:#fff;color:#0b0d12;box-shadow:0 8px 30px rgba(255,255,255,.18)}
-.btn-primary:hover{box-shadow:0 12px 40px rgba(255,255,255,.32)}
-.btn-glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(12px)}
-.btn svg{width:18px;height:18px}
-nav .btn{padding:9px 18px;font-size:14px}
-@media(max-width:760px){.links{display:none}nav .btn{margin-left:auto}}
+/* ---------- preloader: two charcoal doors swing open ---------- */
+.pre{display:none}
+.js .pre{display:grid;place-items:center;position:fixed;inset:0;z-index:100;perspective:1800px;pointer-events:none}
+.pre-l,.pre-r{position:absolute;top:0;bottom:0;width:50.5%;background:linear-gradient(180deg,#141417,#0b0b0d);box-shadow:0 0 80px rgba(0,0,0,.8)}
+.pre-l{left:0;transform-origin:left center;border-right:1px solid rgba(255,255,255,.08)}
+.pre-r{right:0;transform-origin:right center;border-left:1px solid rgba(255,255,255,.08)}
+.pre-in{position:relative;display:flex;flex-direction:column;align-items:center;gap:18px}
+.pre-logo{width:76px;height:76px;border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.1)}
+.pre-mask{overflow:hidden;padding:0 4px}
+.pre-word{display:block;font-weight:700;letter-spacing:.5em;margin-right:-.5em;font-size:15px;background:var(--silver);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pre-bar{width:120px;height:1px;background:rgba(255,255,255,.1);overflow:hidden}
+.pre-bar i{display:block;height:100%;background:#fff;transform-origin:left;transform:scaleX(0)}
+
+/* ---------- backdrop: dots under a soft light ---------- */
+.backdrop{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.dots{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.13) 1px,transparent 1.2px);background-size:26px 26px;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 0%,transparent 65%);mask-image:radial-gradient(ellipse at 50% 0%,#000 0%,transparent 65%)}
+.glow{position:absolute;border-radius:50%;filter:blur(80px);background:radial-gradient(circle,#2b2b31 0%,transparent 65%)}
+.glow.a{width:60vmax;height:60vmax;top:-25vmax;left:-15vmax;animation:drift 26s ease-in-out infinite alternate}
+.glow.b{width:55vmax;height:55vmax;bottom:-30vmax;right:-20vmax;animation:drift 32s ease-in-out infinite alternate-reverse}
+@keyframes drift{to{transform:translate(10vmax,7vmax) scale(1.1)}}
+.progress{position:fixed;top:0;left:0;height:2px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,#55555c,#fff);z-index:60}
+
+/* ---------- liquid glass navbar ---------- */
+.nav{position:fixed;z-index:50;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);
+  width:min(1120px,calc(100% - 32px));display:flex;align-items:center;gap:12px;padding:8px 8px 8px 18px;border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.035));
+  -webkit-backdrop-filter:blur(20px) saturate(170%);backdrop-filter:blur(20px) saturate(170%);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -1px 0 rgba(255,255,255,.04),0 12px 40px rgba(0,0,0,.45);
+  transition:width .7s var(--expo),background .5s var(--expo),transform .7s var(--expo)}
+.nav::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(115deg,rgba(255,255,255,.2) 0%,transparent 30%,transparent 70%,rgba(255,255,255,.1) 100%);mix-blend-mode:screen}
+.nav.compact{width:min(1000px,calc(100% - 32px));background:linear-gradient(180deg,rgba(40,40,44,.7),rgba(18,18,20,.6))}
+.nav.away{transform:translate(-50%,calc(-100% - 30px))}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.22em;font-size:14px;margin-right:auto;white-space:nowrap}
+.brand img{width:28px;height:28px;border-radius:8px;transition:transform .6s var(--spring)}
+.brand:hover img{transform:rotate(-10deg) scale(1.1)}
+.links{position:relative;display:flex;gap:2px}
+.links a{position:relative;z-index:1;padding:9px 14px;border-radius:999px;font-size:13.5px;font-weight:500;color:var(--text-2);transition:color .3s}
+.links a:hover,.links a.active{color:#fff}
+.pill{position:absolute;z-index:0;top:0;height:100%;border-radius:999px;background:rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+  transition:left .6s var(--expo),width .6s var(--expo),opacity .3s;opacity:0}
+.btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:600;font-size:14px;padding:13px 24px;border-radius:999px;border:1px solid transparent;
+  transition:transform .5s var(--spring),box-shadow .5s var(--expo),background .3s;white-space:nowrap;cursor:pointer;font-family:inherit;overflow:hidden}
+.btn svg{width:17px;height:17px;transition:transform .5s var(--spring)}
+.btn:hover svg{transform:translateY(2px)}
+.btn-silver{color:#0b0b0d;background:linear-gradient(180deg,#fff,#c9c9cf);box-shadow:inset 0 1px 0 #fff,0 8px 26px rgba(255,255,255,.12)}
+.btn-silver::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.9),transparent);transform:skewX(-20deg);transition:left .8s var(--expo)}
+.btn-silver:hover::after{left:120%}
+.btn-silver:hover{transform:translateY(-3px) scale(1.02);box-shadow:inset 0 1px 0 #fff,0 16px 40px rgba(255,255,255,.2)}
+.btn-ghost{color:#fff;background:rgba(255,255,255,.05);border-color:var(--line-2)}
+.btn-ghost:hover{background:rgba(255,255,255,.1);transform:translateY(-3px)}
+.nav .btn{padding:10px 18px;font-size:13px}
+.menu{display:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;place-items:center;padding:0;position:relative;z-index:2}
+.menu span{display:block;width:16px;height:1.5px;background:#fff;margin:2.5px 0;transition:transform .5s var(--expo),opacity .2s}
+.menu-open .menu span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.menu-open .menu span:nth-child(2){opacity:0}
+.menu-open .menu span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+
+/* full-screen menu on phones: big numbered links slide up */
+.sheet{position:fixed;inset:0;z-index:45;display:flex;flex-direction:column;justify-content:flex-end;gap:30px;padding:120px 24px calc(36px + env(safe-area-inset-bottom,0px));
+  background:rgba(11,11,13,.82);-webkit-backdrop-filter:blur(24px) saturate(150%);backdrop-filter:blur(24px) saturate(150%);
+  clip-path:circle(0% at calc(100% - 44px) 44px);transition:clip-path .9s var(--expo);pointer-events:none;visibility:hidden}
+.menu-open .sheet{clip-path:circle(150% at calc(100% - 44px) 44px);pointer-events:auto;visibility:visible}
+.sheet nav{display:grid;gap:4px}
+.sheet .ln{overflow:hidden}
+.sheet a{display:flex;align-items:baseline;gap:16px;font-size:clamp(34px,10vw,52px);font-weight:600;letter-spacing:-.03em;line-height:1.2;
+  transform:translateY(110%) rotate(4deg);transform-origin:left bottom;transition:transform .9s var(--expo)}
+.sheet a small{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.1em}
+.menu-open .sheet a{transform:none}
+.menu-open .sheet .ln:nth-child(2) a{transition-delay:.05s}.menu-open .sheet .ln:nth-child(3) a{transition-delay:.1s}
+.menu-open .sheet .ln:nth-child(4) a{transition-delay:.15s}.menu-open .sheet .ln:nth-child(5) a{transition-delay:.2s}.menu-open .sheet .ln:nth-child(6) a{transition-delay:.25s}
+.sheet .foot{color:var(--muted);font-size:13px;opacity:0;transition:opacity .6s .35s}
+.menu-open .sheet .foot{opacity:1}
+@media (max-width:900px){.menu{display:flex;flex-direction:column;align-items:center;justify-content:center}.links{display:none}}
+@media (min-width:901px){.sheet{display:none}}
+@media (max-width:480px){.nav .btn span{display:none}.nav .btn{padding:10px 12px}}
+
+/* ---------- layout ---------- */
+.wrap{width:min(1120px,100%);margin:0 auto;padding-inline:20px}
+section{padding-block:120px}
+.head{max-width:700px;margin-bottom:56px}
+.kicker{display:inline-flex;align-items:center;gap:12px;font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.kicker b{font-weight:600;color:var(--text-2)}
+.kicker::after{content:"";width:40px;height:1px;background:linear-gradient(90deg,var(--muted),transparent)}
+h1,h2,h3{margin:0;letter-spacing:-.02em}
+h2{font-size:clamp(32px,5vw,56px);line-height:1.06;font-weight:700;margin-top:16px}
+h2 em{font-style:italic;font-weight:500}
+.silver{background:var(--silver);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--text-2);font-size:clamp(15px,1.5vw,18px);margin:20px 0 0;font-weight:400}
+.w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.1em;margin-bottom:-.1em}
+.wi{display:inline-block}
 
 /* ---------- hero ---------- */
-.hero{padding-block:clamp(48px,10vh,110px) 40px;text-align:center}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;background:var(--glass);border:1px solid var(--line);font-size:13px;color:var(--muted)}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--a3);box-shadow:0 0 0 0 var(--a3);animation:pulse 2.4s infinite}
-@keyframes pulse{70%{box-shadow:0 0 0 10px transparent}100%{box-shadow:0 0 0 0 transparent}}
-h1{font-size:clamp(56px,13vw,150px);line-height:.95;margin:22px 0 10px;font-weight:800;letter-spacing:-.04em;
-  background:linear-gradient(100deg,#fff 20%,var(--a1) 40%,var(--a2) 55%,#fff 75%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 7s linear infinite}
-@keyframes shine{to{background-position:-250% 0}}
-.lede{font-size:clamp(18px,2.4vw,23px);color:var(--muted);max-width:640px;margin:0 auto 30px}
-.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.meta{margin-top:16px;font-size:13px;color:var(--muted)}
-
-/* TV mockup */
-.stage{perspective:1600px;margin-top:clamp(40px,7vh,80px)}
-.tv{position:relative;max-width:1040px;margin:0 auto;border-radius:22px;padding:10px;background:linear-gradient(145deg,#2a2d36,#0f1116);
-  box-shadow:0 60px 120px -30px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.08),0 0 120px -20px rgba(124,140,255,.35);
-  transform:rotateX(12deg) scale(.96);transition:transform .9s cubic-bezier(.2,.8,.2,1);will-change:transform}
-.tv.on{transform:rotateX(0) scale(1)}
-.screen{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000}
-.screen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.04);transition:opacity 1s ease,transform 6s ease}
-.screen img.show{opacity:1;transform:scale(1)}
-.glare{position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.14),transparent 35%);pointer-events:none;mix-blend-mode:screen}
-.stand{width:22%;height:14px;margin:0 auto;border-radius:0 0 12px 12px;background:linear-gradient(#1b1d24,#0b0c10)}
-.caption{margin-top:18px;font-size:14px;color:var(--muted);min-height:1.6em;transition:opacity .4s}
-
-/* ---------- sections ---------- */
-section{padding-block:clamp(70px,12vh,130px)}
-.kicker{font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--a3);font-weight:600}
-h2{font-size:clamp(34px,5.5vw,62px);line-height:1.05;letter-spacing:-.03em;margin:12px 0 16px;font-weight:700}
-.sub{color:var(--muted);font-size:clamp(16px,2vw,19px);max-width:560px}
-.center{text-align:center}.center .sub{margin-inline:auto}
-
-.feature{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(28px,5vw,70px);align-items:center}
-.feature.flip{grid-template-columns:1fr 1.05fr}
-.feature.flip .shot{order:2}
-@media(max-width:860px){.feature,.feature.flip{grid-template-columns:1fr}.feature.flip .shot{order:0}}
-.shot{position:relative;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);box-shadow:0 40px 90px -30px rgba(0,0,0,.85)}
-.shot img{width:100%;transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
-.shot:hover img{transform:scale(1.04)}
-.ticks{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:12px}
-.ticks li{display:flex;gap:12px;align-items:flex-start;color:#d9dce4}
-.ticks li::before{content:"";flex:none;width:20px;height:20px;margin-top:2px;border-radius:50%;background:var(--glass-2) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M5 12l5 5L20 7'/></svg>") center/12px no-repeat;border:1px solid var(--line)}
-
-/* depth clock demo: live clock over a wallpaper */
-.depth{position:relative;aspect-ratio:16/9}
-.depth img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.live{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);text-align:center;font-family:Antonio,Inter,sans-serif;font-weight:200;line-height:.85;
-  font-size:clamp(70px,13vw,170px);color:rgba(255,255,255,.88);letter-spacing:.04em;text-shadow:0 6px 30px rgba(0,0,0,.25);
-  -webkit-text-stroke:1px rgba(255,255,255,.7);animation:breathe 6s ease-in-out infinite}
-.live small{display:block;font:600 clamp(11px,1.3vw,16px)/1.2 Inter,sans-serif;letter-spacing:.02em;-webkit-text-stroke:0;margin-bottom:8px;color:#fff}
-@keyframes breathe{50%{opacity:.82}}
-
-/* cards grid */
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px}
-@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){.grid{grid-template-columns:1fr}}
-.card{position:relative;padding:28px;border-radius:24px;background:var(--glass);border:1px solid var(--line);overflow:hidden;
-  transition:transform .4s cubic-bezier(.2,.8,.2,1),border-color .4s,background .4s}
-.card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,.28);background:var(--glass-2)}
-.card::after{content:"";position:absolute;inset:-1px;border-radius:inherit;background:radial-gradient(400px circle at var(--mx,50%) var(--my,0%),rgba(255,255,255,.12),transparent 40%);opacity:0;transition:opacity .3s;pointer-events:none}
-.card:hover::after{opacity:1}
-.icon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.04));border:1px solid var(--line);margin-bottom:18px}
-.icon svg{width:24px;height:24px}
-.card h3{margin:0 0 6px;font-size:19px}
-.card p{margin:0;color:var(--muted);font-size:15px}
-
-/* wallpaper marquee */
-.marquee{overflow:hidden;margin-top:44px;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
-.track{display:flex;gap:18px;width:max-content;animation:scroll 50s linear infinite}
-.track.rev{animation-direction:reverse;margin-top:18px}
-.marquee:hover .track{animation-play-state:paused}
-.track img{width:clamp(230px,28vw,380px);aspect-ratio:16/9;object-fit:cover;border-radius:18px;border:1px solid var(--line)}
-@keyframes scroll{to{transform:translateX(-50%)}}
-
-/* stats */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:20px}
-@media(max-width:760px){.stats{grid-template-columns:1fr 1fr}}
-.stat{text-align:center;padding:26px 10px;border-radius:22px;background:var(--glass);border:1px solid var(--line)}
-.stat b{display:block;font-size:clamp(36px,5vw,54px);letter-spacing:-.03em;line-height:1}
-.stat span{color:var(--muted);font-size:14px}
-
-/* install */
-.steps{counter-reset:s;list-style:none;padding:0;margin:16px 0 0;display:grid;gap:10px}
-.steps li{counter-increment:s;display:flex;gap:12px;color:#d9dce4;font-size:15px}
-.steps li::before{content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:#fff;color:#0b0d12}
-code{font:500 13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:rgba(255,255,255,.08);padding:2px 7px;border-radius:6px;word-break:break-all}
-.tag{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:rgba(95,227,200,.14);color:var(--a3);margin-bottom:14px}
-
-/* final cta */
-.final{text-align:center;padding:clamp(48px,8vw,90px) 24px;border-radius:36px;background:linear-gradient(140deg,rgba(124,140,255,.22),rgba(255,143,177,.16) 50%,rgba(95,227,200,.16));border:1px solid var(--line);position:relative;overflow:hidden}
-.final::before{content:"";position:absolute;width:140%;aspect-ratio:1;left:-20%;top:-90%;background:conic-gradient(from 0deg,transparent,rgba(255,255,255,.12),transparent 30%);animation:spin 14s linear infinite}
-.final>*{position:relative}
+.logo-mark{position:relative;display:block;width:clamp(76px,9vw,104px);margin:0 auto 26px}
+.logo-mark .float{display:block}
+.logo-mark img{width:100%;aspect-ratio:1;border-radius:28%;position:relative;z-index:1;
+  box-shadow:0 0 0 1px rgba(255,255,255,.14),inset 0 1px 0 rgba(255,255,255,.3),0 24px 60px -12px rgba(0,0,0,.9)}
+.logo-mark::before{content:"";position:absolute;inset:-30%;border-radius:50%;z-index:0;filter:blur(30px);opacity:.45;
+  background:conic-gradient(from 200deg,#c13f86,#4a3fd0,#1594c4,#c13f86);animation:spin 14s linear infinite}
+.logo-mark::after{content:"";position:absolute;inset:0;border-radius:28%;z-index:2;pointer-events:none;
+  background:linear-gradient(130deg,rgba(255,255,255,.35),transparent 40%)}
 @keyframes spin{to{transform:rotate(360deg)}}
+.foot-brand{display:flex;align-items:center;gap:10px;color:var(--text-2)}
+.foot-brand img{width:26px;height:26px;border-radius:8px}
+.hero{position:relative;padding-top:150px;padding-bottom:60px;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:10px;padding:7px 14px 7px 8px;border-radius:999px;border:1px solid var(--line-2);background:rgba(255,255,255,.04);font-size:13px;color:var(--text-2)}
+.badge i{font-style:normal;font-weight:600;font-size:11px;letter-spacing:.08em;color:#0b0b0d;background:linear-gradient(180deg,#fff,#bdbdc4);padding:3px 9px;border-radius:999px}
+.title-wrap{position:relative;display:table;margin:24px auto 0}
+.hero h1{font-size:clamp(72px,14vw,184px);font-weight:800;line-height:1;letter-spacing:-.055em;padding-bottom:.06em;perspective:800px}
+.hero h1 .ch{display:inline-block;background:var(--silver);-webkit-background-clip:text;background-clip:text;color:transparent;transform-origin:50% 100%}
+.doodle{position:absolute;pointer-events:none;fill:none;stroke:#d9d9de;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.doodle.spark{width:clamp(34px,5vw,58px);top:2%;right:-9%}
+.doodle.under{width:78%;left:11%;bottom:-6%;height:auto;stroke-width:2.6;stroke:#9a9aa2}
+.hero .sub{max-width:620px;margin:22px auto 0}
+.cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:34px}
+.meta{margin-top:16px;color:var(--muted);font-size:13px}
+.orb{position:absolute;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 30% 30%,#fff,#9a9aa2 40%,#2b2b30 75%);opacity:.18;filter:blur(1px)}
+.orb.o1{width:90px;height:90px;left:6%;top:30%}
+.orb.o2{width:44px;height:44px;right:12%;top:16%;opacity:.25}
+.orb.o3{width:140px;height:140px;right:4%;top:62%;opacity:.1;filter:blur(3px)}
+.float{animation:float 7s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-14px)}}
 
-footer{padding-block:40px calc(40px + env(safe-area-inset-bottom,0px));color:var(--muted);font-size:14px;border-top:1px solid var(--line);margin-top:60px}
-footer .row{display:flex;gap:18px;flex-wrap:wrap;justify-content:space-between;align-items:center}
-footer a:hover{color:var(--ink)}
+.showcase{margin:72px auto 0;max-width:980px;perspective:1600px}
+.tv{position:relative;border-radius:20px;padding:10px;background:linear-gradient(180deg,#2b2b30,#121214);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 50px 120px -30px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.06);
+  transform-origin:50% 100%;will-change:transform}
+.screen{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000}
+.screen img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.06);transition:opacity 1.1s var(--expo),transform 1.8s var(--expo)}
+.screen img.on{opacity:1;transform:none}
+.screen::after{content:"";position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,255,255,.1),transparent 40%);pointer-events:none}
+.stand{width:28%;height:12px;margin:0 auto;border-radius:0 0 12px 12px;background:linear-gradient(180deg,#26262a,#141416)}
+.tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:28px}
+.tab{position:relative;overflow:hidden;font:500 13px var(--font);color:var(--text-2);padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.03);cursor:pointer;transition:color .3s,border-color .3s,background .3s,transform .5s var(--spring)}
+.tab:hover{color:#fff;transform:translateY(-2px)}
+.tab.on{color:#fff;border-color:var(--line-2);background:rgba(255,255,255,.07)}
+.tab .bar{position:absolute;left:0;bottom:0;height:2px;width:100%;background:#fff;transform-origin:0 50%;transform:scaleX(0)}
+.tab.on .bar{animation:fill 5s linear forwards}
+@keyframes fill{to{transform:scaleX(1)}}
+.caption{color:var(--muted);font-size:14px;margin-top:16px;min-height:1.6em;transition:opacity .4s}
+.cue{display:block;width:1px;height:56px;margin:56px auto 0;background:rgba(255,255,255,.12);position:relative;overflow:hidden}
+.cue::after{content:"";position:absolute;inset:0;background:#fff;animation:cue 1.8s ease-in-out infinite}
+@keyframes cue{0%{transform-origin:top;transform:scaleY(0)}50%{transform-origin:top;transform:scaleY(1)}51%{transform-origin:bottom}to{transform-origin:bottom;transform:scaleY(0)}}
 
-/* scroll reveal */
-.reveal{opacity:0;transform:translateY(40px) scale(.98);transition:opacity 1s cubic-bezier(.2,.8,.2,1),transform 1s cubic-bezier(.2,.8,.2,1)}
-.reveal.in{opacity:1;transform:none}
-.d1{transition-delay:.08s}.d2{transition-delay:.16s}.d3{transition-delay:.24s}.d4{transition-delay:.32s}.d5{transition-delay:.4s}
-.word{display:inline-block;opacity:0;transform:translateY(.4em);animation:up .8s cubic-bezier(.2,.8,.2,1) forwards}
-@keyframes up{to{opacity:1;transform:none}}
+/* ---------- giant sliding words ---------- */
+.strip{padding-block:40px;overflow:hidden;user-select:none;pointer-events:none}
+.strip .row{display:flex;gap:.35em;white-space:nowrap;font-size:clamp(64px,13vw,190px);font-weight:800;letter-spacing:-.05em;line-height:1.05;will-change:transform}
+.strip .row span{color:rgba(255,255,255,.06)}
+.strip .row span.fill{background:var(--silver);-webkit-background-clip:text;background-clip:text;color:transparent}
+.strip .row.r2{justify-content:flex-end}
 
-/* scroll progress */
-.progress{position:fixed;top:0;left:0;height:3px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--a1),var(--a2),var(--a3));z-index:50}
+/* ---------- features ---------- */
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{position:relative;padding:28px;border-radius:22px;background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--line);overflow:hidden;
+  transition:transform .6s var(--spring),border-color .4s}
+.card::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .4s;
+  background:radial-gradient(420px circle at var(--mx,50%) var(--my,0%),rgba(255,255,255,.09),transparent 45%)}
+.card:hover{transform:translateY(-6px);border-color:var(--line-2)}
+.card:hover::before{opacity:1}
+.card .ico{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;margin-bottom:22px;background:linear-gradient(180deg,#2c2c31,#1a1a1d);border:1px solid var(--line-2);box-shadow:inset 0 1px 0 rgba(255,255,255,.14);transition:transform .6s var(--spring)}
+.card:hover .ico{transform:rotate(-8deg) scale(1.1)}
+.card .ico svg{width:20px;height:20px;stroke:#e6e6ea}
+.card h3{font-size:18px;font-weight:600}
+.card p{color:var(--text-2);font-size:14.5px;margin:10px 0 0}
+.card .num{position:absolute;top:24px;right:26px;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.1em}
 
+.split{display:grid;grid-template-columns:1.05fr 1fr;gap:60px;align-items:center;margin-top:110px}
+.split.flip .shot{order:2}
+.shot{border-radius:20px;overflow:hidden;border:1px solid var(--line-2);box-shadow:0 30px 80px -20px rgba(0,0,0,.8)}
+.shot img{transition:transform 1.4s var(--expo);transform-origin:50% 50%}
+.split h3{font-size:clamp(26px,3.2vw,36px);font-weight:700;line-height:1.12;margin-top:16px}
+.ticks{list-style:none;padding:0;margin:26px 0 0;display:grid;gap:12px}
+.ticks li{display:flex;gap:12px;color:var(--text-2);font-size:15px}
+.ticks li::before{content:"";flex:none;width:6px;height:6px;margin-top:10px;border-radius:50%;background:#d6d6db;box-shadow:0 0 12px rgba(255,255,255,.5)}
+
+/* ---------- stats + charts ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
+.stat{padding:24px;border-radius:20px;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel-2),var(--panel));transition:transform .6s var(--spring)}
+.stat:hover{transform:translateY(-4px)}
+.stat .v{font-size:clamp(30px,3.6vw,44px);font-weight:700;letter-spacing:-.03em;line-height:1.1}
+.stat .v small{font-size:.42em;font-weight:600;color:var(--text-2);margin-left:5px;letter-spacing:0}
+.stat .l{color:var(--text-2);font-size:13.5px;margin-top:8px}
+.charts{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.chart{padding:26px;border-radius:22px;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel-2),var(--panel));min-width:0}
+.chart.wide{grid-column:1/-1}
+.chart h3{font-size:16px;font-weight:600}
+.chart .desc{color:var(--muted);font-size:13px;margin:6px 0 18px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:12.5px;color:var(--text-2);margin-bottom:12px}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.legend i.dash{height:0;border-top:2px dashed var(--budget);border-radius:0;width:16px}
+.plot{position:relative;width:100%}
+.plot svg{display:block;width:100%;overflow:visible}
+.plot text{font-family:var(--font);fill:var(--muted);font-size:11.5px}
+.plot .val{fill:var(--text);font-weight:600;font-size:12px}
+.mark{cursor:pointer;transition:opacity .25s}
+.plot:hover .mark{opacity:.5}
+.plot .mark:hover{opacity:1}
+details{margin-top:14px;font-size:13px;color:var(--text-2)}
+summary{cursor:pointer;color:var(--muted);font-size:12.5px;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+ "}
+details[open] summary::before{content:"– "}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+td,th{text-align:left;padding:6px 0;border-bottom:1px solid var(--line);font-weight:400}
+th{color:var(--muted);font-weight:500}
+td:last-child,th:last-child{text-align:right}
+.donut-wrap{display:grid;grid-template-columns:200px 1fr;gap:28px;align-items:center}
+.donut{position:relative;width:200px;height:200px}
+.donut svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.donut .seg{fill:none;stroke-width:24;transition:stroke-width .3s var(--expo);cursor:pointer}
+.donut .seg:hover{stroke-width:30}
+.donut .mid{position:absolute;inset:0;display:grid;place-content:center;text-align:center;pointer-events:none}
+.donut .mid b{font-size:36px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.donut .mid span{font-size:12px;color:var(--muted);margin-top:4px}
+.rows{display:grid;gap:12px}
+.row{display:grid;grid-template-columns:14px 1fr auto;gap:12px;align-items:center;font-size:14px;color:var(--text-2)}
+.row i{width:12px;height:12px;border-radius:4px}
+.row b{color:var(--text);font-weight:600}
+.row em{display:block;font-style:normal;color:var(--muted);font-size:12.5px}
+.hbars{display:grid;gap:14px}
+.hbar .top{display:flex;justify-content:space-between;gap:12px;font-size:13.5px;color:var(--text-2);margin-bottom:7px}
+.hbar .top b{color:var(--text);font-weight:600}
+.track{height:12px;border-radius:6px;background:rgba(255,255,255,.05);overflow:hidden}
+.fill{height:100%;border-radius:0 4px 4px 0;width:0;transition:width 1.4s var(--expo)}
+.tip{position:fixed;z-index:70;pointer-events:none;padding:10px 12px;border-radius:12px;font-size:12.5px;line-height:1.45;
+  background:rgba(24,24,28,.92);border:1px solid var(--line-2);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  box-shadow:0 12px 30px rgba(0,0,0,.5);opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s;max-width:240px;left:0;top:0}
+.tip.on{opacity:1;transform:none}
+.tip b{display:block;color:#fff;font-weight:600}
+.tip span{color:var(--text-2)}
+
+/* ---------- wallpapers: pinned fan of cards ---------- */
+.fan{position:relative;height:100vh;height:100svh;min-height:620px;padding:0;overflow:hidden}
+.fan-intro,.fan-outro{position:absolute;left:0;right:0;text-align:center;z-index:2;padding-inline:20px}
+.fan-intro{top:15%}
+.fan-outro{bottom:9%}
+.js .fan-outro{opacity:0}
+.fan-outro p{color:var(--text-2);margin:0 auto;max-width:520px}
+.fan-outro .btn{margin-top:20px}
+.fan-stage{position:absolute;left:50%;top:54%;width:0;height:0}
+.fan-card{position:absolute;left:0;top:0;width:clamp(190px,24vw,340px);aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:1px solid var(--line-2);
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.9);background:#000;transform:translate(-50%,-50%);will-change:transform}
+.fan-card img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--expo)}
+.fan-card:hover img{transform:scale(1.08)}
+@media (max-width:767px){
+  .fan{height:auto;min-height:0;padding-block:110px 90px}
+  .fan-intro,.fan-outro{position:relative;top:auto;bottom:auto;opacity:1}
+  .fan-stage{position:relative;left:auto;top:auto;width:100%;height:max(250px,72vw);margin:24px 0}
+  .fan-card{left:50%;top:50%;width:40vw}
+}
+
+/* ---------- install ---------- */
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text-2);border:1px solid var(--line-2);border-radius:999px;padding:4px 10px;margin-bottom:16px}
+ol.steps{margin:16px 0 0;padding:0;list-style:none;counter-reset:s;display:grid;gap:12px}
+ol.steps li{counter-increment:s;display:grid;grid-template-columns:28px 1fr;gap:10px;font-size:14.5px;color:var(--text-2)}
+ol.steps li::before{content:counter(s);width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:600;color:#0b0b0d;background:linear-gradient(180deg,#fff,#b9b9c0)}
+ol.steps a{color:#fff;text-decoration:underline;text-underline-offset:3px}
+.install-chart{margin-top:16px}
+
+/* ---------- final ---------- */
+.final{text-align:center;padding:110px 24px;border-radius:32px;border:1px solid var(--line);position:relative;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 0%,#28282d 0%,var(--panel) 60%)}
+.final .dots{opacity:.6;-webkit-mask-image:radial-gradient(ellipse at 50% 50%,#000 0%,transparent 70%);mask-image:radial-gradient(ellipse at 50% 50%,#000 0%,transparent 70%)}
+.final::before{content:"";position:absolute;top:0;left:-40%;width:40%;height:1px;background:linear-gradient(90deg,transparent,#fff,transparent);animation:sweep 6s var(--expo) infinite}
+@keyframes sweep{to{left:100%}}
+.final h2{font-size:clamp(36px,6vw,72px);margin:0;position:relative}
+.final .sub,.final .cta{position:relative}
+.remote{position:absolute;left:0;top:7%;width:38px;opacity:.22;pointer-events:none;z-index:0}
+footer{padding:50px 0 calc(40px + env(safe-area-inset-bottom,0px));color:var(--muted);font-size:13px}
+footer .wrap{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center}
+footer a:hover{color:#fff}
+
+@media (max-width:900px){
+  section{padding-block:90px}
+  .features,.steps-grid{grid-template-columns:1fr 1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .charts{grid-template-columns:1fr}
+  .split,.split.flip{grid-template-columns:1fr;gap:28px;margin-top:72px}
+  .split.flip .shot{order:0}
+  .orb{display:none}
+}
+@media (max-width:600px){
+  .features,.steps-grid{grid-template-columns:1fr}
+  .donut-wrap{grid-template-columns:1fr;justify-items:center}
+  .donut-wrap .rows{width:100%}
+  .chart,.card{padding:22px}
+  .stat{padding:18px}
+  .hero{padding-top:130px}
+  .doodle.spark{right:-14%}
+}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
-  .reveal{opacity:1;transform:none}.word{opacity:1;transform:none}
-  .tv{transform:none}
+  html{scroll-behavior:auto}
 }
 </style>
 </head>
 <body>
+<div class="pre" id="pre" aria-hidden="true">
+  <div class="pre-l"></div><div class="pre-r"></div>
+  <div class="pre-in">
+    <img class="pre-logo" src="assets/icon.png" alt="">
+    <div class="pre-mask"><span class="pre-word">LUMA</span></div>
+    <div class="pre-bar"><i></i></div>
+  </div>
+</div>
+<div class="backdrop"><div class="glow a"></div><div class="glow b"></div><div class="dots"></div></div>
 <div class="progress" id="progress"></div>
-<div class="sky"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
-<div class="grain"></div>
+<div class="tip" id="tip" role="status"></div>
 
-<nav class="wrap">
-  <div class="bar">
-    <a class="brand" href="#top"><img src="assets/icon.png" alt="">LUMA</a>
-    <div class="links">
-      <a href="#features">Features</a>
-      <a href="#wallpapers">Wallpapers</a>
-      <a href="#install">Install</a>
-      <a href="https://github.com/sharmaronit/LUMA">GitHub</a>
-    </div>
-    <a class="btn btn-primary" href="https://github.com/sharmaronit/LUMA/releases/latest/download/luma.apk">Download</a>
+<nav class="nav" id="nav" aria-label="Main">
+  <a class="brand" href="#top"><img src="assets/icon.png" alt="">LUMA</a>
+  <div class="links" id="links">
+    <span class="pill" id="pill"></span>
+    <a href="#features">Features</a>
+    <a href="#performance">Performance</a>
+    <a href="#clean">Clean my TV</a>
+    <a href="#wallpapers">Wallpapers</a>
+    <a href="#install">Install</a>
+    <a href="https://github.com/sharmaronit/LUMA">GitHub</a>
   </div>
+  <a class="btn btn-silver" href="https://github.com/sharmaronit/LUMA/releases/latest/download/luma.apk">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14"/></svg><span>Download</span></a>
+  <button class="menu" id="menu" aria-label="Open menu" aria-expanded="false" aria-controls="sheet"><span></span><span></span><span></span></button>
 </nav>
+<div class="sheet" id="sheet">
+  <nav aria-label="Menu">
+    <div class="ln"><a href="#features"><small>01</small>Features</a></div>
+    <div class="ln"><a href="#performance"><small>02</small>Performance</a></div>
+    <div class="ln"><a href="#clean"><small>03</small>Clean my TV</a></div>
+    <div class="ln"><a href="#wallpapers"><small>04</small>Wallpapers</a></div>
+    <div class="ln"><a href="#install"><small>05</small>Install</a></div>
+    <div class="ln"><a href="https://github.com/sharmaronit/LUMA"><small>06</small>GitHub</a></div>
+  </nav>
+  <p class="foot">Luma 1.0 · Free and open source · Created by Ronit Sharma</p>
+</div>
 
-<header class="hero wrap" id="top">
-  <span class="eyebrow"><span class="dot"></span>Free · Open source · No ads</span>
-  <h1 id="title">Luma</h1>
-  <p class="lede" id="lede">A calm, fast home screen for Android TV and Google TV. Beautiful depth wallpapers, glass menus and a cleaner that makes old TVs feel new.</p>
-  <div class="cta">
-    <a class="btn btn-primary" href="https://github.com/sharmaronit/LUMA/releases/latest/download/luma.apk">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14"/></svg>Download APK</a>
-    <a class="btn btn-glass" href="#install">How to install</a>
+<main id="top">
+<!-- HERO -->
+<header class="hero wrap" id="hero">
+  <span class="orb o1" data-speed="0.6"></span><span class="orb o2 float" data-speed="1.4"></span><span class="orb o3" data-speed="0.3"></span>
+  <div class="logo-mark" data-hero-logo><span class="float"><img src="assets/icon.png" alt="Luma logo"></span></div>
+  <span class="badge" data-hero-copy><i>1.0</i>Free and open source · Android TV and Google TV</span>
+  <div class="title-wrap">
+    <h1 aria-label="Luma"><span class="ch">L</span><span class="ch">u</span><span class="ch">m</span><span class="ch">a</span></h1>
+    <svg class="doodle spark" viewBox="0 0 48 48" aria-hidden="true"><path data-draw d="M24 4c1.5 11 5 16.5 20 20-15 3.5-18.5 9-20 20-1.5-11-5-16.5-20-20 15-3.5 18.5-9 20-20z"/></svg>
+    <svg class="doodle under" viewBox="0 0 300 24" aria-hidden="true"><path data-draw d="M4 16c60-12 150-14 292-4"/></svg>
   </div>
-  <p class="meta">Version 1.0.0 · Android TV 7.1 and newer</p>
+  <p class="sub" data-hero-copy>A calm, fast home screen for your TV. Depth wallpapers, glass menus, a StandBy clock and a built-in cleaner that makes older TVs feel new.</p>
+  <div class="cta" data-hero-copy>
+    <a class="btn btn-silver" href="https://github.com/sharmaronit/LUMA/releases/latest/download/luma.apk">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14"/></svg>Download APK</a>
+    <a class="btn btn-ghost" href="#install">How to install</a>
+  </div>
+  <p class="meta" data-hero-copy>Version 1.0.0 · Android 7.1 and newer · No account, no ads</p>
 
-  <div class="stage">
+  <div class="showcase" id="showcase">
     <div class="tv" id="tv">
       <div class="screen" id="screen">
-        <img src="assets/home.webp" class="show" alt="Luma home screen with a depth clock behind mountains" data-cap="Home — your favourites and a clock that sits behind the mountains">
-        <img src="assets/quick.webp" alt="Quick settings panel" data-cap="Quick settings — Wi-Fi, sleep timer, StandBy and profiles">
-        <img src="assets/settings.webp" alt="Luma Settings" data-cap="Settings — grouped, glassy and quick to move through">
-        <img src="assets/standby-world.webp" alt="StandBy world clock" data-cap="StandBy — a full-screen clock when the TV is idle">
-        <div class="glare"></div>
+        <img class="on" src="assets/home.webp" alt="Luma home screen with a clock behind the mountains">
+        <img src="assets/quick.webp" alt="Quick settings panel" loading="lazy">
+        <img src="assets/settings.webp" alt="Luma settings" loading="lazy">
+        <img src="assets/standby-world.webp" alt="StandBy world clock" loading="lazy">
       </div>
     </div>
     <div class="stand"></div>
-    <p class="caption" id="caption">Home — your favourites and a clock that sits behind the mountains</p>
+    <div class="tabs" id="tabs" role="tablist">
+      <button class="tab on" role="tab">Home<span class="bar"></span></button>
+      <button class="tab" role="tab">Quick settings<span class="bar"></span></button>
+      <button class="tab" role="tab">Settings<span class="bar"></span></button>
+      <button class="tab" role="tab">StandBy<span class="bar"></span></button>
+    </div>
+    <p class="caption" id="caption">Home: your favourite apps, with a clock that sits behind the mountains</p>
+    <span class="cue" aria-hidden="true"></span>
   </div>
 </header>
 
-<main>
+<!-- FEATURES -->
 <section id="features" class="wrap">
-  <div class="feature">
-    <div class="shot depth reveal">
-      <img src="assets/wp-dunes.webp" alt="Sand dunes under a starry sky">
-      <div class="live" id="live"><small id="liveDate"></small><span id="liveTime">10:42</span></div>
+  <div class="head">
+    <span class="kicker" data-up><b>01</b> Features</span>
+    <h2 data-split><span class="silver">Everything important.</span><br>Nothing <em>extra.</em></h2>
+    <p class="sub" data-up>Built for a remote, a slow TV processor and a living room, not a phone.</p>
+  </div>
+  <div class="features" data-stagger>
+    <article class="card" data-up><span class="num">01</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20l6-10 4 6 3-4 5 8z"/><circle cx="12" cy="6" r="2"/></svg></div><h3>Depth wallpapers</h3><p>14 photos, each cut by hand so the clock sits behind the peaks, dunes and treelines.</p></article>
+    <article class="card" data-up><span class="num">02</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>StandBy</h3><p>After two quiet minutes the TV becomes a clock. Choose from analog, solid, colour or world faces.</p></article>
+    <article class="card" data-up><span class="num">03</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></div><h3>Clean my TV</h3><p>Switches off ads, tracking and preinstalled extras. Nothing is deleted, and one press undoes it.</p></article>
+    <article class="card" data-up><span class="num">04</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4-6"/></svg></div><h3>Profiles</h3><p>Everyone in the house gets their own favourites, wallpaper, theme and clock.</p></article>
+    <article class="card" data-up><span class="num">05</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div><h3>Recent apps</h3><p>Press Home on Home to see open apps. Press Up on an app to close it and free memory.</p></article>
+    <article class="card" data-up><span class="num">06</span><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"/></svg></div><h3>Private by design</h3><p>No account, no analytics and no ads. Your layout and settings stay on the TV.</p></article>
+  </div>
+
+  <div class="split">
+    <div class="shot" data-mask><img src="assets/quick.webp" alt="Quick settings panel" loading="lazy"></div>
+    <div>
+      <span class="kicker" data-up>Quick settings</span>
+      <h3 data-split>One glass panel for the things you change every day.</h3>
+      <ul class="ticks" data-stagger>
+        <li data-up>Wi-Fi, Bluetooth and sound toggles</li>
+        <li data-up>Sleep timer, wallpapers and StandBy</li>
+        <li data-up>Switch profile from a drop-down list</li>
+        <li data-up>Luma settings and TV settings, one press away</li>
+      </ul>
     </div>
-    <div class="reveal d2">
-      <span class="kicker">Depth wallpapers</span>
-      <h2>A clock that lives inside the scene.</h2>
-      <p class="sub">Every wallpaper is cut by hand so the time sits behind the peaks, dunes and treelines — placed where each photo has room to breathe.</p>
-      <ul class="ticks">
-        <li>14 real photographs: mountains, beaches, dunes, lakes and aurora</li>
-        <li>Frosted glass digits, drawn once a minute so it never slows the TV</li>
-        <li>Browse full screen with ◀ ▶ and see exactly how Home will look</li>
+  </div>
+  <div class="split flip">
+    <div class="shot" data-mask><img src="assets/standby-picker.webp" alt="StandBy face picker" loading="lazy"></div>
+    <div>
+      <span class="kicker" data-up>StandBy</span>
+      <h3 data-split>When the remote rests, the TV becomes a clock.</h3>
+      <ul class="ticks" data-stagger>
+        <li data-up>Starts after two minutes idle on Home</li>
+        <li data-up>Pick a face from a row of live previews</li>
+        <li data-up>Start it any time from quick settings</li>
+        <li data-up>Any button brings you straight back</li>
       </ul>
     </div>
   </div>
 </section>
 
-<section class="wrap">
-  <div class="feature flip">
-    <div class="shot reveal"><img src="assets/quick.webp" alt="Quick settings" loading="lazy"></div>
-    <div class="reveal d2">
-      <span class="kicker">Quick settings</span>
-      <h2>Everything important. Nothing extra.</h2>
-      <p class="sub">Select the clock to open a compact glass panel: network, Bluetooth, sound, a sleep timer, wallpapers, StandBy and who's watching.</p>
-      <ul class="ticks">
-        <li>Sleep timer that really turns the TV off</li>
-        <li>Profiles — each person gets their own favourites, wallpaper and font</li>
-        <li>Recent apps: press Home on Home, then ▲ to close an app</li>
-      </ul>
+<div class="strip" aria-hidden="true">
+  <div class="row r1" data-slide="-1"><span>calm</span><span class="fill">fast</span><span>private</span><span>calm</span><span class="fill">fast</span><span>private</span></div>
+  <div class="row r2" data-slide="1"><span>open</span><span>source</span><span class="fill">free</span><span>open</span><span>source</span><span class="fill">free</span></div>
+</div>
+
+<!-- PERFORMANCE -->
+<section id="performance" class="wrap">
+  <div class="head">
+    <span class="kicker" data-up><b>02</b> Performance</span>
+    <h2 data-split><span class="silver">Measured on a 2 GB box.</span><br>Not <em>guessed.</em></h2>
+    <p class="sub" data-up>Every number below was measured on a Xiaomi Mi Box 4, using Flutter's own frame timings while the remote moves around Home.</p>
+  </div>
+  <div class="stats" data-stagger>
+    <div class="stat" data-up><div class="v"><span data-count="5.4" data-dec="1">0</span><small>ms</small></div><div class="l">Median frame time on Home</div></div>
+    <div class="stat" data-up><div class="v"><span data-count="0.52" data-dec="2">0</span><small>%</small></div><div class="l">Frames that missed 60 fps</div></div>
+    <div class="stat" data-up><div class="v"><span data-count="85" data-dec="0">0</span><small>% less</small></div><div class="l">Frame time than the first beta</div></div>
+    <div class="stat" data-up><div class="v"><span data-count="14" data-dec="0">0</span><small>scenes</small></div><div class="l">Depth wallpapers built in</div></div>
+  </div>
+  <div class="charts">
+    <div class="chart wide" data-up>
+      <h3>Median frame time, step by step</h3>
+      <p class="desc">Milliseconds to draw one frame while moving through the dock. Below the dashed line means smooth 60 fps.</p>
+      <div class="legend"><span><i style="background:var(--c1)"></i>Median frame time</span><span><i class="dash"></i>60 fps budget (16.7 ms)</span></div>
+      <div class="plot" id="chart-frames"></div>
+      <details><summary>View data</summary><table id="t-frames"></table></details>
+    </div>
+    <div class="chart" data-up>
+      <h3>Frames that missed 60 fps</h3>
+      <p class="desc">Share of frames slower than 16.7 ms.</p>
+      <div class="plot" id="chart-miss"></div>
+      <details><summary>View data</summary><table id="t-miss"></table></details>
+    </div>
+    <div class="chart" data-up>
+      <h3>Depth clock drawing time</h3>
+      <p class="desc">Median time to draw the clock over the wallpaper.</p>
+      <div class="legend"><span><i style="background:var(--c2)"></i>Live blur, every frame</span><span><i style="background:var(--c3)"></i>Baked once a minute</span></div>
+      <div class="plot" id="chart-clock"></div>
+      <details><summary>View data</summary><table><tr><th>Version</th><th>Median</th></tr><tr><td>Live blur</td><td>36 ms</td></tr><tr><td>Baked once a minute</td><td>9.4 ms</td></tr></table></details>
     </div>
   </div>
 </section>
 
-<section class="wrap">
-  <div class="feature">
-    <div class="shot reveal"><img src="assets/standby-world.webp" alt="StandBy world clock" loading="lazy"></div>
-    <div class="reveal d2">
-      <span class="kicker">StandBy</span>
-      <h2>When the remote rests, the TV becomes a clock.</h2>
-      <p class="sub">After two quiet minutes Luma fades into a full-screen clock. Any button brings you straight back.</p>
-      <div class="shot reveal d3" style="margin-top:26px;border-radius:20px"><img src="assets/standby-picker.webp" alt="StandBy styles" loading="lazy"></div>
+<!-- CLEAN MY TV -->
+<section id="clean" class="wrap">
+  <div class="head">
+    <span class="kicker" data-up><b>03</b> Clean my TV</span>
+    <h2 data-split><span class="silver">100 packages reviewed.</span><br>Only the safe ones <em>touched.</em></h2>
+    <p class="sub" data-up>Clean my TV and the computer scripts share one list. Each app is sorted by how safe it is to switch off, and anything the TV needs is protected.</p>
+  </div>
+  <div class="charts">
+    <div class="chart" data-up>
+      <h3>What happens to each package</h3>
+      <p class="desc">Every entry in the cleaning lists, by tier.</p>
+      <div class="donut-wrap">
+        <div class="donut" id="donut"><svg viewBox="0 0 220 220" role="img" aria-label="Packages by tier"></svg><div class="mid"><b data-count="100" data-dec="0">0</b><span>packages</span></div></div>
+        <div class="rows" id="donut-rows"></div>
+      </div>
+    </div>
+    <div class="chart" data-up>
+      <h3>Packages per TV family</h3>
+      <p class="desc">Luma detects your TV and picks the matching lists.</p>
+      <div class="hbars" id="families"></div>
     </div>
   </div>
 </section>
 
-<section class="wrap center">
-  <span class="kicker reveal">Built for the remote</span>
-  <h2 class="reveal d1">Small touches that add up.</h2>
-  <p class="sub reveal d2">Luma is designed around a D-pad, a slow TV processor and a living room — not a phone.</p>
-  <div class="grid">
-    <div class="card reveal d1"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></div><h3>Clean my TV</h3><p>Switches off ads, tracking and preloaded extras from the TV itself. Nothing is deleted, and one press undoes it.</p></div>
-    <div class="card reveal d2"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div><h3>Fast on cheap boxes</h3><p>Tuned on a 2 GB Mi Box. Lite mode turns heavy effects down automatically on slower TVs.</p></div>
-    <div class="card reveal d3"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8"/></svg></div><h3>Stays awake on Home</h3><p>The screen won't switch off while Luma is showing — StandBy keeps it useful instead.</p></div>
-    <div class="card reveal d1"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><h3>Notifications</h3><p>A small bell appears only when there is something new. Nothing leaves your TV.</p></div>
-    <div class="card reveal d2"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg></div><h3>Profiles</h3><p>Up to six people, each with their own favourites, wallpaper, theme and clock.</p></div>
-    <div class="card reveal d3"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v6c0 4-3.5 7-8 8-4.5-1-8-4-8-8V7z"/></svg></div><h3>Private by design</h3><p>No account, no analytics, no ads. Your layout and settings stay on the TV.</p></div>
+<!-- WALLPAPERS: pinned fan -->
+<section id="wallpapers" class="fan">
+  <div class="fan-intro" id="fan-intro">
+    <span class="kicker"><b>04</b> Wallpapers</span>
+    <h2><span class="silver">Real places.</span><br>Free to <em>use.</em></h2>
   </div>
-  <div class="stats">
-    <div class="stat reveal d1"><b data-count="14">0</b><span>depth wallpapers</span></div>
-    <div class="stat reveal d2"><b data-count="4">0</b><span>StandBy faces</span></div>
-    <div class="stat reveal d3"><b data-count="0" data-suffix="">0</b><span>ads, ever</span></div>
-    <div class="stat reveal d4"><b data-count="60" data-suffix=" fps">0</b><span>on Home, on a 2 GB box</span></div>
+  <div class="fan-stage" id="fan-stage"></div>
+  <div class="fan-outro" id="fan-outro">
+    <p>Mountains, dunes, coastlines and night skies. Every photo is public domain (CC0), with a clock placed by hand behind the scenery.</p>
   </div>
 </section>
 
-<section id="wallpapers">
-  <div class="wrap center">
-    <span class="kicker reveal">Wallpapers</span>
-    <h2 class="reveal d1">Real places. Free to use.</h2>
-    <p class="sub reveal d2">Every photo is public-domain (CC0) and credited in the app.</p>
-  </div>
-  <div class="marquee reveal d2">
-    <div class="track" id="trackA"></div>
-    <div class="track rev" id="trackB"></div>
-  </div>
-</section>
-
+<!-- INSTALL -->
 <section id="install" class="wrap">
-  <div class="center">
-    <span class="kicker reveal">Install</span>
-    <h2 class="reveal d1">Three ways in. Pick yours.</h2>
-    <p class="sub reveal d2">All three install Luma and can switch off the bloatware that slows your TV down.</p>
+  <div class="head">
+    <span class="kicker" data-up><b>05</b> Install</span>
+    <h2 data-split><span class="silver">Three ways in.</span><br>Pick <em>yours.</em></h2>
+    <p class="sub" data-up>Each one installs Luma, and each can switch off the bloatware that slows your TV down.</p>
   </div>
-  <div class="grid">
-    <div class="card reveal d1">
+  <div class="steps-grid" data-stagger>
+    <div class="card" data-up>
       <span class="tag">Easiest</span>
       <h3>On the TV only</h3>
       <ol class="steps">
-        <li>Install <b>Downloader</b> from the Play Store.</li>
-        <li>Open it and enter <code>github.com/sharmaronit/LUMA/releases/latest/download/luma.apk</code></li>
-        <li>Install, open Luma and choose it as your Home app.</li>
-        <li>Optional: Settings › Device › <b>Clean my TV</b>.</li>
+        <li><span>Install <b>Downloader</b> from the Play Store.</span></li>
+        <li><span>Open it and enter <code class="url">github.com/sharmaronit/LUMA/releases/latest/download/luma.apk</code></span></li>
+        <li><span>Install, open Luma and choose it as your Home app.</span></li>
+        <li><span>Optional: Settings › Device › <b>Clean my TV</b>.</span></li>
       </ol>
     </div>
-    <div class="card reveal d2">
+    <div class="card" data-up>
       <span class="tag">Works on every TV</span>
       <h3>With a computer</h3>
       <ol class="steps">
-        <li>Turn on USB debugging on the TV.</li>
-        <li>Download <a href="https://github.com/sharmaronit/LUMA/releases/latest/download/luma.apk"><u>luma.apk</u></a> and run <code>adb install luma.apk</code></li>
-        <li>Run the debloat script from the repo: <code>scripts/debloat</code></li>
+        <li><span>Turn on USB debugging on the TV.</span></li>
+        <li><span>Download <a href="https://github.com/sharmaronit/LUMA/releases/latest/download/luma.apk">luma.apk</a> and run <code>adb install luma.apk</code></span></li>
+        <li><span>Run the cleaning script from the repo: <code>scripts/debloat</code></span></li>
       </ol>
     </div>
-    <div class="card reveal d3">
+    <div class="card" data-up>
       <span class="tag">Hands-off</span>
       <h3>With an AI assistant</h3>
       <ol class="steps">
-        <li>Turn on USB debugging on the TV.</li>
-        <li>Open Claude Code, Codex or a similar assistant.</li>
-        <li>Paste <a href="https://github.com/sharmaronit/LUMA/blob/main/PROMPT.md"><u>PROMPT.md</u></a> and answer its questions.</li>
+        <li><span>Turn on USB debugging on the TV.</span></li>
+        <li><span>Open Claude Code, Codex or a similar assistant.</span></li>
+        <li><span>Paste <a href="https://github.com/sharmaronit/LUMA/blob/main/PROMPT.md">PROMPT.md</a> and answer its questions.</span></li>
       </ol>
     </div>
   </div>
+  <div class="chart install-chart" data-up>
+    <h3>Which download should I pick?</h3>
+    <p class="desc">File sizes on the 1.0.0 release. The universal APK works on every TV; the smaller ones fit one processor type.</p>
+    <div class="hbars" id="sizes"></div>
+  </div>
 </section>
 
-<section class="wrap">
-  <div class="final reveal">
-    <h2>Make your TV feel new.</h2>
-    <p class="sub" style="margin:0 auto 28px">Free forever. Open source. Built by one person who wanted a calmer living room.</p>
-    <div class="cta">
-      <a class="btn btn-primary" href="https://github.com/sharmaronit/LUMA/releases/latest/download/luma.apk">Download Luma 1.0</a>
-      <a class="btn btn-glass" href="https://github.com/sharmaronit/LUMA">Star on GitHub</a>
+<section class="wrap" style="padding-top:10px" id="final-wrap">
+  <div class="final" data-mask id="final">
+    <div class="dots"></div>
+    <svg class="remote" id="remote" viewBox="0 0 40 100" fill="none" stroke="#e6e6ea" stroke-width="2" aria-hidden="true"><rect x="4" y="2" width="32" height="96" rx="16"/><circle cx="20" cy="26" r="9"/><circle cx="20" cy="26" r="3"/><circle cx="13" cy="50" r="2.5"/><circle cx="27" cy="50" r="2.5"/><circle cx="13" cy="62" r="2.5"/><circle cx="27" cy="62" r="2.5"/></svg>
+    <h2 data-split><span class="silver">Make your TV</span> <em>feel new.</em></h2>
+    <p class="sub" style="margin:18px auto 30px;max-width:520px" data-up>Free forever and open source. Built by one person who wanted a calmer living room.</p>
+    <div class="cta" style="margin:0" data-up>
+      <a class="btn btn-silver" href="https://github.com/sharmaronit/LUMA/releases/latest/download/luma.apk">Download Luma 1.0</a>
+      <a class="btn btn-ghost" href="https://github.com/sharmaronit/LUMA">Star on GitHub</a>
     </div>
   </div>
 </section>
 </main>
 
-<footer class="wrap">
-  <div class="row">
-    <span>Luma · Created by Ronit Sharma</span>
-    <span>
-      <a href="https://github.com/sharmaronit/LUMA">Source</a> ·
-      <a href="https://github.com/sharmaronit/LUMA/blob/main/PRIVACY.md">Privacy</a> ·
-      <a href="https://github.com/sharmaronit/LUMA/blob/main/NOTICE">Licences &amp; credits</a> · GPL-3.0
-    </span>
+<footer>
+  <div class="wrap">
+    <span class="foot-brand"><img src="assets/icon.png" alt="">Luma · Created by Ronit Sharma</span>
+    <span><a href="https://github.com/sharmaronit/LUMA">Source</a> · <a href="https://github.com/sharmaronit/LUMA/blob/main/PRIVACY.md">Privacy</a> · <a href="https://github.com/sharmaronit/LUMA/blob/main/NOTICE">Licences &amp; credits</a> · GPL-3.0</span>
   </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 <script>
 (() => {
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const root = document.documentElement;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const G = !reduce && window.gsap && window.ScrollTrigger ? window.gsap : null;
+if (!G) root.classList.remove('js');
+window.__lumaReady = true;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const NS = 'http://www.w3.org/2000/svg';
+const css = n => getComputedStyle(root).getPropertyValue(n).trim();
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const EASE = 'cubic-bezier(.16,1,.3,1)';
 
-  // Headline words rise in one after another.
-  const lede = document.getElementById('lede');
-  if (!reduce) {
-    lede.innerHTML = lede.textContent.split(' ').map((w, i) =>
-      `<span class="word" style="animation-delay:${.25 + i * .035}s">${w}</span>`).join(' ');
+/* ---------- smooth scrolling ---------- */
+let lenis = null;
+if (G) {
+  G.registerPlugin(ScrollTrigger);
+  if (window.Lenis) {
+    lenis = new Lenis({ lerp: .09, smoothWheel: true });
+    lenis.on('scroll', ScrollTrigger.update);
+    G.ticker.add(t => lenis.raf(t * 1000));
+    G.ticker.lagSmoothing(0);
   }
+}
+function goTo(hash) {
+  const t = $(hash); if (!t) return;
+  if (lenis) lenis.scrollTo(t, { offset: -90, duration: 1.4 }); else t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+}
+$$('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
+  if (a.hash.length < 2 && a.getAttribute('href') !== '#top') return;
+  e.preventDefault(); closeMenu();
+  if (a.getAttribute('href') === '#top') { lenis ? lenis.scrollTo(0, { duration: 1.4 }) : scrollTo({ top: 0, behavior: 'smooth' }); return; }
+  goTo(a.hash);
+}));
 
-  // TV straightens up on load, then tilts gently with the pointer on desktop.
-  const tv = document.getElementById('tv');
-  requestAnimationFrame(() => setTimeout(() => tv.classList.add('on'), 150));
-  if (!reduce && matchMedia('(pointer:fine)').matches) {
-    addEventListener('pointermove', e => {
-      const x = e.clientX / innerWidth - .5, y = e.clientY / innerHeight - .5;
-      tv.style.transform = `rotateX(${(-y * 6).toFixed(2)}deg) rotateY(${(x * 8).toFixed(2)}deg)`;
-    }, { passive: true });
+/* ---------- tooltip ---------- */
+const tip = $('#tip');
+function showTip(e, title, line) {
+  tip.innerHTML = `<b>${title}</b><span>${line}</span>`;
+  tip.classList.add('on');
+  const x = Math.max(8, Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8));
+  const y = e.clientY - tip.offsetHeight - 14;
+  tip.style.left = x + 'px'; tip.style.top = (y < 8 ? e.clientY + 18 : y) + 'px';
+}
+const hideTip = () => tip.classList.remove('on');
+function hover(node, title, line) {
+  node.classList.add('mark');
+  node.addEventListener('pointermove', e => showTip(e, title, line));
+  node.addEventListener('pointerleave', hideTip);
+}
+addEventListener('scroll', hideTip, { passive: true });
+
+/* ---------- nav: sliding pill, hides on the way down ---------- */
+const nav = $('#nav'), pill = $('#pill'), links = $$('#links a'), menu = $('#menu');
+function closeMenu() { root.classList.remove('menu-open'); menu.setAttribute('aria-expanded', false); lenis && lenis.start(); }
+menu.addEventListener('click', () => {
+  const open = root.classList.toggle('menu-open');
+  menu.setAttribute('aria-expanded', open);
+  if (lenis) open ? lenis.stop() : lenis.start();
+});
+addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+function movePill(a) {
+  if (!a) { pill.style.opacity = 0; return; }
+  pill.style.opacity = 1; pill.style.left = a.offsetLeft + 'px'; pill.style.width = a.offsetWidth + 'px';
+}
+const sections = links.filter(a => a.hash).map(a => $(a.hash));
+const tv = $('#tv');
+let lastY = 0, ticking = false;
+function onScroll() {
+  ticking = false;
+  const y = scrollY;
+  nav.classList.toggle('compact', y > 40);
+  if (!root.classList.contains('menu-open')) nav.classList.toggle('away', y > 500 && y > lastY + 2);
+  if (y < lastY - 2) nav.classList.remove('away');
+  lastY = y;
+  $('#progress').style.transform = `scaleX(${y / Math.max(1, root.scrollHeight - innerHeight)})`;
+  let current = null;
+  for (const s of sections) if (s.getBoundingClientRect().top < innerHeight * .4) current = s;
+  const a = current && links.find(l => l.hash === '#' + current.id);
+  links.forEach(l => l.classList.toggle('active', l === a));
+  movePill(a);
+  if (!G && !reduce && innerWidth > 600) {
+    const r = tv.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, 1 - (r.top - innerHeight * .2) / (innerHeight * .55)));
+    tv.style.transform = `rotateX(${(14 * (1 - p)).toFixed(2)}deg) scale(${(.96 + .04 * p).toFixed(4)})`;
   }
+}
+const queue = () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } };
+addEventListener('scroll', queue, { passive: true });
+addEventListener('resize', queue);
 
-  // Screenshots cross-fade on the TV.
-  const shots = [...document.querySelectorAll('#screen img')], cap = document.getElementById('caption');
-  let n = 0;
-  setInterval(() => {
-    shots[n].classList.remove('show');
-    n = (n + 1) % shots.length;
-    shots[n].classList.add('show');
-    cap.style.opacity = 0;
-    setTimeout(() => { cap.textContent = shots[n].dataset.cap; cap.style.opacity = 1; }, 300);
-  }, 4200);
+/* ---------- hero screenshots ---------- */
+const shots = $$('#screen img'), tabs = $$('#tabs .tab');
+const captions = [
+  'Home: your favourite apps, with a clock that sits behind the mountains',
+  'Quick settings: select the clock to open a compact glass panel',
+  'Settings: clean groups, with the current profile at the top',
+  'StandBy: a world clock that appears when the remote rests',
+];
+let shot = 0, timer;
+function showShot(i) {
+  shot = i;
+  shots.forEach((s, j) => s.classList.toggle('on', j === i));
+  tabs.forEach((t, j) => { t.classList.remove('on'); t.setAttribute('aria-selected', j === i); if (j === i) { void t.offsetWidth; t.classList.add('on'); } });
+  const c = $('#caption'); c.style.opacity = 0;
+  setTimeout(() => { c.textContent = captions[i]; c.style.opacity = 1; }, 200);
+  clearTimeout(timer);
+  if (!reduce) timer = setTimeout(() => showShot((shot + 1) % shots.length), 5000);
+}
+tabs.forEach((t, i) => t.addEventListener('click', () => showShot(i)));
+showShot(0);
 
-  // Live clock on the depth demo.
-  const t = document.getElementById('liveTime'), d = document.getElementById('liveDate');
-  const tick = () => {
-    const now = new Date();
-    t.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-    d.textContent = now.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' });
+/* ---------- card glow ---------- */
+$$('.card').forEach(c => c.addEventListener('pointermove', e => {
+  const r = c.getBoundingClientRect();
+  c.style.setProperty('--mx', e.clientX - r.left + 'px');
+  c.style.setProperty('--my', e.clientY - r.top + 'px');
+}));
+
+/* ---------- count up ---------- */
+function countUp(node) {
+  const end = parseFloat(node.dataset.count), dec = +node.dataset.dec || 0;
+  if (reduce) { node.textContent = end.toFixed(dec); return; }
+  const t0 = performance.now(), dur = 1800;
+  const step = t => {
+    const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 4);
+    node.textContent = (end * e).toFixed(dec);
+    if (p < 1) requestAnimationFrame(step);
   };
-  tick(); setInterval(tick, 15000);
+  requestAnimationFrame(step);
+}
 
-  // Wallpaper marquee: each row holds the set twice for a seamless loop.
-  const walls = ['aoraki','dunes','lighthouse','aurora','lake','shore','volcano','dolomites','misty','rose'];
-  const fill = (el, list) => el.innerHTML = [...list, ...list].map(w =>
-    `<img src="assets/wp-${w}.webp" alt="" loading="lazy">`).join('');
-  fill(document.getElementById('trackA'), walls.slice(0, 5));
-  fill(document.getElementById('trackB'), walls.slice(5));
+/* ---------- data: docs/mibox-performance.md, scripts/debloat/lists and the v1.0.0 release ---------- */
+const frames = [
+  ['First beta', 'Beta', 35.5, 99.4], ['Isolate glass', 'Glass', 30.6, 97.8], ['Prepare wallpaper', 'Wallpaper', 16.7, 49.9],
+  ['Cache panels', 'Panels', 12.2, 17.4], ['Less clipping', 'Clipping', 11.5, 8.7], ['Release build', 'Release', 5.4, 0.52],
+];
+const tiers = [
+  ['Switched off', 'Ads, tracking and demos', 34, '--c1'],
+  ['Optional', 'Only with the stronger setting', 20, '--c2'],
+  ['Stock launchers', 'Replaced by Luma', 7, '--c4'],
+  ['Protected', 'Never touched', 39, '--c3'],
+];
+const families = [['All TVs', 43], ['Fire TV', 22], ['Xiaomi PatchWall', 22], ['Android TV boxes', 10], ['Google TV', 3]];
+const sizes = [['luma.apk (universal)', 78.9], ['arm64-v8a (newer TVs)', 36.5], ['armeabi-v7a (older TVs)', 34.2]];
+$('#t-frames').innerHTML = '<tr><th>Step</th><th>Median</th></tr>' + frames.map(f => `<tr><td>${f[0]}</td><td>${f[2]} ms</td></tr>`).join('');
+$('#t-miss').innerHTML = '<tr><th>Step</th><th>Missed</th></tr>' + frames.map(f => `<tr><td>${f[0]}</td><td>${f[3]}%</td></tr>`).join('');
 
-  // Reveal on scroll, and count the stats up once.
-  const count = el => {
-    const end = +el.dataset.count, suffix = el.dataset.suffix || '', start = performance.now();
-    const step = now => {
-      const p = Math.min(1, (now - start) / 1400), v = Math.round(end * (1 - Math.pow(1 - p, 3)));
-      el.textContent = v + suffix;
-      if (p < 1) requestAnimationFrame(step);
-    };
-    reduce ? el.textContent = end + suffix : requestAnimationFrame(step);
-  };
-  const io = new IntersectionObserver(entries => entries.forEach(e => {
-    if (!e.isIntersecting) return;
-    e.target.classList.add('in');
-    e.target.querySelectorAll?.('[data-count]').forEach(count);
-    if (e.target.dataset.count) count(e.target);
+function barPath(x, y, w, h) {
+  const r = Math.min(4, w / 2, h);
+  return `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`;
+}
+function columns(host, data, opts) {
+  host.innerHTML = '';
+  const W = host.clientWidth;
+  const tilt = W < 640 && data.length > 3;
+  const H = (opts.height || 280) + (tilt ? 30 : 0), m = { t: 24, r: 6, b: tilt ? 64 : 34, l: 32 };
+  const iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, height: H, role: 'img', 'aria-label': opts.label }, host);
+  const y = v => m.t + ih - (v / opts.max) * ih;
+  for (const g of opts.ticks) {
+    el('line', { x1: m.l, x2: W - m.r, y1: y(g), y2: y(g), stroke: 'rgba(255,255,255,.06)' }, svg);
+    el('text', { x: m.l - 8, y: y(g) + 4, 'text-anchor': 'end' }, svg).textContent = g;
+  }
+  const band = iw / data.length, bw = Math.min(opts.barMax || 56, band * .56);
+  const anim = [];
+  data.forEach((d, i) => {
+    const cx = m.l + band * i + band / 2, h = (d.v / opts.max) * ih;
+    const g = el('g', {}, svg);
+    el('rect', { x: cx - band / 2, y: m.t, width: band, height: ih, fill: 'transparent' }, g);
+    const p = el('path', { d: barPath(cx - bw / 2, y(d.v), bw, h), fill: css(d.c) }, g);
+    p.style.transformBox = 'view-box';
+    p.style.transformOrigin = `${cx}px ${m.t + ih}px`;
+    p.style.transform = 'scaleY(0)';
+    p.style.transition = `transform 1.3s ${EASE} ${i * .09}s`;
+    const t = el('text', { x: cx, y: y(d.v) - 8, 'text-anchor': 'middle', class: 'val' }, g);
+    t.textContent = d.v + (opts.unit || '');
+    t.style.opacity = 0; t.style.transition = `opacity .6s ${.6 + i * .09}s`;
+    const ly = H - m.b + 20;
+    el('text', tilt ? { x: cx + 4, y: ly - 4, 'text-anchor': 'end', transform: `rotate(-38 ${cx + 4} ${ly - 4})` } : { x: cx, y: ly, 'text-anchor': 'middle' }, g).textContent = tilt ? d.short : d.k;
+    hover(g, d.k, d.tip);
+    anim.push(() => { p.style.transform = 'scaleY(1)'; t.style.opacity = 1; });
+  });
+  if (opts.budget) {
+    const by = y(opts.budget);
+    const line = el('line', { x1: m.l, x2: W - m.r, y1: by, y2: by, stroke: css('--budget'), 'stroke-width': 1.5, 'stroke-dasharray': '5 5' }, svg);
+    line.style.opacity = 0; line.style.transition = 'opacity .8s .9s';
+    anim.push(() => line.style.opacity = 1);
+  }
+  return () => anim.forEach(f => f());
+}
+function lineChart(host, data, opts) {
+  host.innerHTML = '';
+  const W = host.clientWidth, H = 240, m = { t: 22, r: 14, b: 34, l: 40 };
+  const iw = W - m.l - m.r, ih = H - m.t - m.b;
+  const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, height: H, role: 'img', 'aria-label': opts.label }, host);
+  const x = i => m.l + (iw / (data.length - 1)) * i, y = v => m.t + ih - (v / 100) * ih;
+  for (const g of [0, 25, 50, 75, 100]) {
+    el('line', { x1: m.l, x2: W - m.r, y1: y(g), y2: y(g), stroke: 'rgba(255,255,255,.06)' }, svg);
+    el('text', { x: m.l - 8, y: y(g) + 4, 'text-anchor': 'end' }, svg).textContent = g + '%';
+  }
+  const color = css(opts.color);
+  const pts = data.map((d, i) => [x(i), y(d.v)]);
+  const dPath = 'M' + pts.map(p => p.join(',')).join('L');
+  const defs = el('defs', {}, svg);
+  const grad = el('linearGradient', { id: 'missFill', x1: 0, x2: 0, y1: 0, y2: 1 }, defs);
+  el('stop', { offset: '0%', 'stop-color': color, 'stop-opacity': .28 }, grad);
+  el('stop', { offset: '100%', 'stop-color': color, 'stop-opacity': 0 }, grad);
+  const area = el('path', { d: dPath + `L${x(data.length - 1)},${y(0)}L${x(0)},${y(0)}Z`, fill: 'url(#missFill)' }, svg);
+  area.style.opacity = 0; area.style.transition = 'opacity 1s .9s';
+  const line = el('path', { d: dPath, fill: 'none', stroke: color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, svg);
+  const len = line.getTotalLength();
+  line.style.strokeDasharray = len; line.style.strokeDashoffset = len;
+  line.style.transition = `stroke-dashoffset 1.8s ${EASE}`;
+  const dots = pts.map(([px, py], i) => {
+    const c = el('circle', { cx: px, cy: py, r: 4.5, fill: color, stroke: css('--panel'), 'stroke-width': 2 }, svg);
+    c.style.opacity = 0; c.style.transition = `opacity .4s ${.25 + i * .2}s`;
+    return c;
+  });
+  const narrow = W < 460;
+  data.forEach((d, i) => {
+    const last = i === data.length - 1;
+    if (narrow && !last && (i % 2 || i === data.length - 2)) return;
+    el('text', { x: x(i), y: H - m.b + 20, 'text-anchor': i === 0 ? 'start' : last ? 'end' : 'middle' }, svg).textContent = d.short;
+  });
+  const labels = [
+    el('text', { x: x(0) + 10, y: y(data[0].v) + 22, class: 'val' }, svg),
+    el('text', { x: x(data.length - 1) - 10, y: y(data.at(-1).v) - 12, 'text-anchor': 'end', class: 'val' }, svg),
+  ];
+  labels[0].textContent = data[0].v + '%'; labels[1].textContent = data.at(-1).v + '%';
+  labels.forEach((l, i) => { l.style.opacity = 0; l.style.transition = `opacity .6s ${i ? 1.6 : .4}s`; });
+  const cross = el('line', { y1: m.t, y2: m.t + ih, stroke: 'rgba(255,255,255,.25)', 'stroke-width': 1 }, svg);
+  cross.style.opacity = 0;
+  const hit = el('rect', { x: m.l - 10, y: 0, width: iw + 20, height: H, fill: 'transparent' }, svg);
+  hit.addEventListener('pointermove', e => {
+    const r = svg.getBoundingClientRect();
+    const i = Math.max(0, Math.min(data.length - 1, Math.round((e.clientX - r.left - m.l) / (iw / (data.length - 1)))));
+    cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.style.opacity = 1;
+    dots.forEach((d, j) => d.setAttribute('r', j === i ? 6.5 : 4.5));
+    showTip(e, data[i].k, data[i].v + '% of frames missed 60 fps');
+  });
+  hit.addEventListener('pointerleave', () => { cross.style.opacity = 0; dots.forEach(d => d.setAttribute('r', 4.5)); hideTip(); });
+  return () => { line.style.strokeDashoffset = 0; area.style.opacity = 1; labels.forEach(l => l.style.opacity = 1); dots.forEach(d => d.style.opacity = 1); };
+}
+function donut() {
+  const svg = $('#donut svg'), rows = $('#donut-rows');
+  const total = tiers.reduce((a, t) => a + t[2], 0), R = 90, C = 2 * Math.PI * R, gap = 3;
+  let off = 0;
+  const segs = tiers.map((t, i) => {
+    const len = (t[2] / total) * C;
+    const s = el('circle', { cx: 110, cy: 110, r: R, class: 'seg', stroke: css(t[3]), 'stroke-dasharray': `0 ${C}`, 'stroke-dashoffset': -off }, svg);
+    s.style.transition = `stroke-dasharray 1.3s ${EASE} ${i * .18}s, stroke-width .3s`;
+    s.dataset.len = Math.max(0, len - gap);
+    hover(s, t[0], `${t[2]} packages · ${t[1]}`);
+    off += len;
+    rows.insertAdjacentHTML('beforeend', `<div class="row"><i style="background:var(${t[3]})"></i><span><b>${t[0]}</b><em>${t[1]}</em></span><b>${t[2]}</b></div>`);
+    return s;
+  });
+  $$('.row', rows).forEach((r, i) => {
+    r.addEventListener('pointerenter', () => segs[i].style.strokeWidth = 30);
+    r.addEventListener('pointerleave', () => segs[i].style.strokeWidth = '');
+  });
+  return () => segs.forEach(s => s.style.strokeDasharray = `${s.dataset.len} ${C}`);
+}
+function hbars(host, data, color, unit, max) {
+  host.innerHTML = data.map(d => `<div class="hbar"><div class="top"><span>${d[0]}</span><b>${d[1]}${unit}</b></div><div class="track"><div class="fill" style="background:var(${color})" data-w="${(d[1] / max) * 100}"></div></div></div>`).join('');
+  return () => $$('.fill', host).forEach((f, i) => setTimeout(() => f.style.width = f.dataset.w + '%', i * 110));
+}
+
+/* play charts and counters once they are on screen */
+const played = new Set(), players = new Map();
+const io = new IntersectionObserver(entries => {
+  for (const e of entries) {
+    if (!e.isIntersecting) continue;
     io.unobserve(e.target);
-  }), { threshold: .15 });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    if (e.target.dataset.count) { countUp(e.target); continue; }
+    const play = players.get(e.target);
+    if (play) { played.add(e.target); setTimeout(play, G ? 250 : 0); }
+  }
+}, { threshold: .3 });
+function register(node, play) {
+  players.set(node, play);
+  if (played.has(node)) requestAnimationFrame(() => requestAnimationFrame(play)); else io.observe(node);
+}
+function buildCharts() {
+  register($('#chart-frames'), columns($('#chart-frames'), frames.map(f => ({
+    k: f[0], short: f[1], v: f[2], c: '--c1', tip: `${f[2]} ms median · ${f[2] <= 16.7 ? 'smooth at 60 fps' : 'too slow for 60 fps'}`,
+  })), { max: 40, ticks: [0, 10, 20, 30, 40], budget: 16.7, label: 'Median frame time by optimisation step' }));
+  register($('#chart-miss'), lineChart($('#chart-miss'), frames.map(f => ({ k: f[0], short: f[1], v: f[3] })),
+    { color: '--c2', label: 'Share of frames that missed 60 fps' }));
+  register($('#chart-clock'), columns($('#chart-clock'), [
+    { k: 'Live blur', short: 'Live blur', v: 36, c: '--c2', tip: '36 ms median · blurred every frame' },
+    { k: 'Baked', short: 'Baked', v: 9.4, c: '--c3', tip: '9.4 ms median · drawn once a minute' },
+  ], { max: 40, ticks: [0, 10, 20, 30, 40], unit: ' ms', height: 240, barMax: 72, label: 'Depth clock drawing time' }));
+}
+buildCharts();
+register($('#donut'), donut());
+register($('#families'), hbars($('#families'), families, '--c1', '', 43));
+register($('#sizes'), hbars($('#sizes'), sizes, '--c3', ' MB', 80));
+$$('[data-count]').forEach(n => io.observe(n));
+let rt, lastW = innerWidth;
+addEventListener('resize', () => {
+  if (innerWidth === lastW) return;
+  lastW = innerWidth; clearTimeout(rt); rt = setTimeout(() => { buildCharts(); G && ScrollTrigger.refresh(); }, 150);
+});
 
-  // Cards light up where the pointer is.
-  document.querySelectorAll('.card').forEach(c => c.addEventListener('pointermove', e => {
-    const r = c.getBoundingClientRect();
-    c.style.setProperty('--mx', (e.clientX - r.left) + 'px');
-    c.style.setProperty('--my', (e.clientY - r.top) + 'px');
-  }));
+/* ---------- wallpaper fan ---------- */
+const wps = [['lake', 'Twilight lake'], ['misty', 'Misty peak'], ['shore', 'Golden shore'], ['volcano', 'Volcano view'], ['aoraki', 'Aoraki sunrise'],
+  ['dunes', 'Star dunes'], ['dolomites', 'Dolomites'], ['lighthouse', 'Lighthouse'], ['aurora', 'Aurora camp']];
+const stage = $('#fan-stage');
+stage.innerHTML = wps.map(([f, n]) => `<figure class="fan-card" style="margin:0"><img src="assets/wp-${f}.webp" alt="${n}" loading="lazy"></figure>`).join('');
+const cards = $$('.fan-card', stage), mid = (cards.length - 1) / 2;
+const spread = () => Math.min((innerWidth < 768 ? .068 : .085) * innerWidth, 135);
+const fanned = {
+  xPercent: -50, yPercent: -50,
+  x: i => (i - mid) * spread(),
+  y: i => innerWidth < 768 ? 5 * Math.pow(Math.abs(i - mid), 2) - 25 : 10 * Math.pow(Math.abs(i - mid), 2) - 70,
+  rotate: i => (i - mid) * 8,
+};
+if (!G) {
+  cards.forEach((c, i) => c.style.transform = `translate(-50%,-50%) translate(${fanned.x(i)}px,${fanned.y(i)}px) rotate(${fanned.rotate(i)}deg)`);
+}
 
-  // Reading progress bar.
-  const bar = document.getElementById('progress');
-  addEventListener('scroll', () => {
-    const max = document.documentElement.scrollHeight - innerHeight;
-    bar.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
-  }, { passive: true });
+/* ---------- GSAP choreography ---------- */
+if (G) {
+  // split headings into words that rise out of a mask
+  function split(node, silver) {
+    [...node.childNodes].forEach(n => {
+      if (n.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(part => {
+          if (!part) return;
+          if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(' ')); return; }
+          const w = document.createElement('span'); w.className = 'w';
+          const wi = document.createElement('span'); wi.className = 'wi' + (silver ? ' silver' : ''); wi.textContent = part;
+          w.appendChild(wi); frag.appendChild(w);
+        });
+        n.replaceWith(frag);
+      } else if (n.nodeType === 1 && n.tagName !== 'BR') {
+        const s = silver || n.classList.contains('silver');
+        n.classList.remove('silver');
+        split(n, s);
+      }
+    });
+  }
+  $$('[data-split]').forEach(h => {
+    h.setAttribute('aria-label', h.textContent.replace(/\s+/g, ' ').trim());
+    split(h, false);
+    G.set(h, { autoAlpha: 1 });
+    G.fromTo($$('.wi', h), { yPercent: 115, rotate: 5 }, {
+      yPercent: 0, rotate: 0, duration: 1.2, ease: 'expo.out', stagger: .05,
+      scrollTrigger: { trigger: h, start: 'top 88%', once: true },
+    });
+  });
+
+  // fade-up, staggered inside groups
+  const grouped = new Set();
+  $$('[data-stagger]').forEach(g => {
+    const items = $$(':scope > [data-up]', g);
+    items.forEach(i => grouped.add(i));
+    G.fromTo(items, { autoAlpha: 0, y: 60, rotate: i => (i % 2 ? 1.5 : -1.5) }, {
+      autoAlpha: 1, y: 0, rotate: 0, duration: 1.2, ease: 'expo.out', stagger: .09,
+      scrollTrigger: { trigger: g, start: 'top 85%', once: true },
+    });
+  });
+  $$('[data-up]').filter(n => !grouped.has(n)).forEach(n => {
+    G.fromTo(n, { autoAlpha: 0, y: 40 }, {
+      autoAlpha: 1, y: 0, duration: 1.1, ease: 'expo.out',
+      scrollTrigger: { trigger: n, start: 'top 88%', once: true },
+    });
+  });
+
+  // rounded mask wipes up, image settles from a zoom
+  $$('[data-mask]').forEach(m => {
+    G.set(m, { autoAlpha: 1 });
+    const tl = G.timeline({ scrollTrigger: { trigger: m, start: 'top 82%', once: true } });
+    tl.fromTo(m, { clipPath: 'inset(100% 0% 0% 0% round 24px)' }, { clipPath: 'inset(0% 0% 0% 0% round 24px)', duration: 1.6, ease: 'expo.inOut' });
+    const img = $('img', m);
+    if (img) tl.fromTo(img, { scale: 1.3 }, { scale: 1, duration: 2, ease: 'expo.out' }, '<0.2');
+  });
+
+  // floating orbs drift at different speeds
+  $$('[data-speed]').forEach(o => {
+    G.to(o, { y: () => (1 - parseFloat(o.dataset.speed)) * 260, ease: 'none',
+      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true } });
+  });
+
+  // TV lies back, then stands up as you scroll
+  G.fromTo(tv, { rotateX: 16, scale: .94 }, { rotateX: 0, scale: 1, ease: 'none',
+    scrollTrigger: { trigger: '#showcase', start: 'top 85%', end: 'top 25%', scrub: .8 } });
+
+  // giant words slide sideways
+  $$('[data-slide]').forEach(r => {
+    G.fromTo(r, { xPercent: 0 }, { xPercent: 22 * parseFloat(r.dataset.slide), ease: 'none',
+      scrollTrigger: { trigger: '.strip', start: 'top bottom', end: 'bottom top', scrub: 1 } });
+  });
+
+  // wallpaper fan: pinned, cards spread from a stack
+  const mm = G.matchMedia();
+  mm.add('(min-width: 768px)', () => {
+    G.set(cards, { xPercent: -50, yPercent: -50, x: 0, rotate: i => (i - mid) * 2.2, y: i => -2 * i, autoAlpha: 1 });
+    G.set('#fan-outro', { autoAlpha: 0, y: 60 });
+    G.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '#wallpapers', start: 'top top', end: '+=170%', pin: true, scrub: .8, anticipatePin: 1, invalidateOnRefresh: true } })
+      .fromTo('#fan-intro', { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: -60, duration: .25 }, 0)
+      .to(cards, { x: fanned.x, y: fanned.y, rotate: fanned.rotate, duration: 1, ease: 'power2.inOut', stagger: { each: .02, from: 'center' } }, .1)
+      .to('#fan-outro', { autoAlpha: 1, y: 0, duration: .35 }, .85);
+  });
+  mm.add('(max-width: 767px)', () => {
+    G.set(cards, { xPercent: -50, yPercent: -50, x: 0, y: 0, rotate: 0 });
+    G.to(cards, { x: fanned.x, y: fanned.y, rotate: fanned.rotate, duration: 1.4, ease: 'expo.out', stagger: { each: .04, from: 'center' },
+      scrollTrigger: { trigger: '#fan-stage', start: 'top 80%', once: true } });
+  });
+
+  // remote drifts across the closing banner
+  G.fromTo('#remote', { x: '-10vw', y: 40, rotate: -20 }, { x: '85vw', y: -30, rotate: 18, ease: 'none',
+    scrollTrigger: { trigger: '#final', start: 'top bottom', end: 'bottom top', scrub: 1 } });
+
+  // doodles draw themselves
+  const doodles = $$('[data-draw]').map(p => { const l = p.getTotalLength(); G.set(p, { strokeDasharray: l, strokeDashoffset: l }); return p; });
+
+  // opening: doors swing open, then the hero builds
+  const hero = G.timeline({ paused: true, defaults: { ease: 'expo.out' } })
+    .fromTo('[data-hero-logo]', { autoAlpha: 0, scale: .3, rotate: -25, y: 30 }, { autoAlpha: 1, scale: 1, rotate: 0, y: 0, duration: 1.4, ease: 'back.out(1.7)' }, 0)
+    .fromTo('.hero h1', { autoAlpha: 0 }, { autoAlpha: 1, duration: .01 }, 0)
+    .fromTo('.hero h1 .ch', { yPercent: 110, rotateX: -80, autoAlpha: 0 }, { yPercent: 0, rotateX: 0, autoAlpha: 1, duration: 1.4, stagger: .08 }, 0)
+    .fromTo('[data-hero-copy]', { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 1, stagger: .1 }, .25)
+    .fromTo('.badge i', { scale: .3, rotate: -90 }, { scale: 1, rotate: 0, duration: 1.2, ease: 'back.out(1.8)' }, .3)
+    .to(doodles, { strokeDashoffset: 0, duration: 1.2, ease: 'power2.inOut', stagger: .2 }, .7)
+    .fromTo('#showcase', { autoAlpha: 0, y: 220, rotateX: 40 }, { autoAlpha: 1, y: 0, rotateX: 0, duration: 1.8 }, .4);
+  const pre = G.timeline({ defaults: { ease: 'expo.out' }, onComplete: () => $('#pre').remove() })
+    .from('.pre-logo', { scale: .6, autoAlpha: 0, rotate: -12, duration: .9 })
+    .from('.pre-word', { yPercent: 110, duration: .8 }, '<.25')
+    .to('.pre-bar i', { scaleX: 1, duration: .7, ease: 'power2.inOut' }, '<.1')
+    .to('.pre-in', { autoAlpha: 0, y: -20, duration: .4, ease: 'power2.in' }, '+=.15')
+    .to('.pre-l', { rotateY: -100, duration: 1.2, ease: 'power3.inOut' }, '<.2')
+    .to('.pre-r', { rotateY: 100, duration: 1.2, ease: 'power3.inOut' }, '<')
+    .add(() => hero.play(), '<.35');
+  if (lenis) { lenis.stop(); pre.eventCallback('onComplete', () => { $('#pre').remove(); lenis.start(); }); }
+  addEventListener('load', () => ScrollTrigger.refresh());
+}
+
+onScroll();
 })();
 </script>
 </body>
