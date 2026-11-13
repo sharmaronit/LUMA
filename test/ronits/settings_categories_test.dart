@@ -99,7 +99,7 @@ void main() {
       expect(find.text('From your apps'), findsOneWidget);
       expect(find.text('Programme sources'), findsOneWidget);
       expect(find.text('Apps & Favourites'), findsOneWidget);
-      expect(find.text('Remote shortcuts'), findsOneWidget);
+      expect(find.text('Remote shortcuts'), findsNothing);
       expect(find.text('Font style'), findsNothing);
       await tester.binding.handlePopRoute();
       await tester.pumpAndSettle();
@@ -115,11 +115,11 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(group('Device'));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('setting-network')));
+      expect(find.byKey(const ValueKey('setting-network')), findsNothing);
       await tester.tap(
-        find.byKey(const ValueKey('setting-bluetooth-and-remotes')),
+        find.byKey(const ValueKey('setting-android-tv-settings')),
       );
-      expect(opened, ['wifi', 'bluetooth']);
+      expect(opened, ['all']);
       await tester.tap(find.byTooltip('Back to settings'));
       await tester.pumpAndSettle();
       await tester.ensureVisible(group('About'));

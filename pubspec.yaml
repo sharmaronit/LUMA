@@ -1,7 +1,7 @@
 name: luma
 description: Flutter-based Android TV launcher.
 
-version: 1.0.0+4200
+version: 1.0.1+4201
 
 environment:
   sdk: ">=3.11.0"

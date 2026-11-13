@@ -233,10 +233,7 @@ void main() {
         ),
       ),
     );
-    for (final entry in {
-      'Bluetooth & remotes': 'bluetooth',
-      'Android TV settings': 'all',
-    }.entries) {
+    for (final entry in {'Android TV settings': 'all'}.entries) {
       await tester.tap(find.byTooltip('Control Centre'));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('settings-category-Device')));
@@ -252,13 +249,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     }
-    await tester.tap(find.byTooltip('Control Centre'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('settings-category-Device')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Wi-Fi'));
-    await tester.pumpAndSettle();
-    expect(network, 1);
+    expect(network, 0);
     await tester.pumpWidget(const SizedBox());
   });
   testWidgets('Home reset returns a scrolled launcher to its first app', (

@@ -378,7 +378,7 @@ class _QuickSettingsContentState extends State<QuickSettingsContent>
       Icons.volume_up_rounded,
       'Navigation sounds and animations',
     ),
-    ('Device', Icons.tv_rounded, 'Wi-Fi, Bluetooth and TV settings'),
+    ('Device', Icons.tv_rounded, 'Default Home, cleaner and TV settings'),
     ('About', Icons.info_rounded, 'Help, information and backups'),
   ];
   FocusNode _categoryNode(String name) => categoryFocus.putIfAbsent(name, () {
@@ -578,13 +578,6 @@ class _QuickSettingsContentState extends State<QuickSettingsContent>
         icon: Icons.play_circle_rounded,
         onPressed: () => showProgrammeSources(context),
       ),
-      if (widget.onRemoteShortcuts != null)
-        TvMenuRow(
-          key: const ValueKey('setting-remote-shortcuts'),
-          title: 'Remote shortcuts',
-          icon: Icons.settings_remote_rounded,
-          onPressed: widget.onRemoteShortcuts!,
-        ),
     ],
     'Sound & Motion' => [
       if (widget.soundSettings != null) widget.soundSettings!,
@@ -604,24 +597,10 @@ class _QuickSettingsContentState extends State<QuickSettingsContent>
         ),
     ],
     'Device' => [
-      TvMenuRow(
-        key: const ValueKey('setting-network'),
-        autofocus: true,
-        title: 'Wi-Fi',
-        subtitle: status['network'] as String? ?? widget.networkStatus,
-        icon: Icons.wifi_rounded,
-        onPressed: widget.onWifi,
-      ),
-      TvMenuRow(
-        key: const ValueKey('setting-bluetooth-and-remotes'),
-        title: 'Bluetooth & remotes',
-        subtitle: status['bluetooth'] as String? ?? widget.bluetoothStatus,
-        icon: Icons.bluetooth_rounded,
-        onPressed: () => widget.onDeviceSettings('bluetooth'),
-      ),
       if (widget.onHomeSettings != null)
         TvMenuRow(
           key: const ValueKey('setting-default-home-settings'),
+          autofocus: true,
           title: 'Default launcher',
           subtitle: status['defaultHome'] == true
               ? 'Luma is the default Home'
@@ -632,6 +611,7 @@ class _QuickSettingsContentState extends State<QuickSettingsContent>
       if (!widget.preview)
         TvMenuRow(
           key: const ValueKey('setting-android-tv-settings'),
+          autofocus: widget.onHomeSettings == null,
           title: 'Android TV settings',
           icon: Icons.settings_rounded,
           onPressed: () => widget.onDeviceSettings('all'),
@@ -651,14 +631,6 @@ class _QuickSettingsContentState extends State<QuickSettingsContent>
         icon: Icons.cleaning_services_rounded,
         onPressed: () => showTvCleaner(context),
       ),
-      if (widget.minimalBackground == 'glass-real' &&
-          widget.onPerformanceChanged != null)
-        toggle(
-          'Lower GPU usage',
-          widget.performanceMode,
-          widget.onPerformanceChanged!,
-          subtitle: 'Optimise wallpaper rendering',
-        ),
       if (status['bluetoothPermission'] == false &&
           status['bluetoothSupported'] != false &&
           widget.onBluetoothStatusPermission != null)

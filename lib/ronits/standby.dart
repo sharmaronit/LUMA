@@ -22,7 +22,7 @@ import 'motion.dart';
 class StandbySettings {
   StandbySettings(this._prefs);
   final SharedPreferences _prefs;
-  static const styles = ['analog', 'solid', 'colour', 'world'];
+  static const styles = ['analog', 'calendar', 'solid', 'colour', 'world'];
   static const idle = Duration(minutes: 2);
 
   /// Told when a setting changes, so the idle watcher picks it up.
@@ -50,6 +50,7 @@ class StandbySettings {
 }
 
 String standbyStyleLabel(String style) => switch (style) {
+  'calendar' => 'Calendar',
   'solid' => 'Solid',
   'colour' => 'Colour',
   'world' => 'World',
@@ -57,6 +58,7 @@ String standbyStyleLabel(String style) => switch (style) {
 };
 
 String standbyStyleHint(String style) => switch (style) {
+  'calendar' => 'A clock beside the month',
   'solid' => 'Large digits in one colour',
   'colour' => 'Each digit in its own colour',
   'world' => 'A map showing where it is day',
@@ -253,6 +255,7 @@ class _StandbyScreenState extends State<StandbyScreen> {
 /// is given, so the same painter draws the full screen and the small preview.
 CustomPainter standbyFace(String style, DateTime time, {bool use24 = true}) =>
     switch (style) {
+      'calendar' => _CalendarFace(time, use24),
       'solid' => _SolidFace(time, use24),
       'colour' => _ColourFace(time, use24),
       'world' => _WorldFace(time, use24),
@@ -666,6 +669,156 @@ class _WorldFace extends CustomPainter {
 
   @override
   bool shouldRepaint(_WorldFace old) =>
+      old.time.minute != time.minute || old.time.hour != time.hour;
+}
+
+/// A short zone name: Android gives "IST", some systems give
+/// "India Standard Time", which becomes "IST" too.
+String _zoneCode(String name) {
+  if (name.length <= 5) return name.toUpperCase();
+  final words = name.split(RegExp(r'\s+')).where((w) => w.isNotEmpty);
+  return words.map((w) => w[0]).join().toUpperCase();
+}
+
+/// Two widgets side by side: a dark square clock ringed with minute marks
+/// (lit up to the current minute) and this month's calendar with today in
+/// red.
+class _CalendarFace extends CustomPainter {
+  _CalendarFace(this.time, this.use24);
+  final DateTime time;
+  final bool use24;
+  static const _red = Color(0xffff453a);
+  static const _months = [
+    'JANUARY',
+    'FEBRUARY',
+    'MARCH',
+    'APRIL',
+    'MAY',
+    'JUNE',
+    'JULY',
+    'AUGUST',
+    'SEPTEMBER',
+    'OCTOBER',
+    'NOVEMBER',
+    'DECEMBER',
+  ];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final unit = size.height;
+    final side = math.min(unit * .8, size.width * .44);
+    final top = (size.height - side) / 2;
+    final left = size.width * .06;
+    final panel = Rect.fromLTWH(left, top, side, side);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(panel, Radius.circular(side * .13)),
+      Paint()..color = const Color(0xff1c1c1e),
+    );
+
+    // Minute marks around the square, pointing at the centre.
+    final centre = panel.center;
+    final reach = side * .43, length = side * .045;
+    final lit = Paint()
+      ..color = Colors.white
+      ..strokeWidth = side * .008
+      ..strokeCap = StrokeCap.round;
+    final dim = Paint()
+      ..color = const Color(0x40ffffff)
+      ..strokeWidth = side * .008
+      ..strokeCap = StrokeCap.round;
+    for (var i = 0; i < 60; i++) {
+      final angle = i / 60 * 2 * math.pi - math.pi / 2;
+      final dx = math.cos(angle), dy = math.sin(angle);
+      final edge = reach / math.max(dx.abs(), dy.abs());
+      final outer = centre + Offset(dx, dy) * edge;
+      final inner =
+          centre + Offset(dx, dy) * (edge - length * (i % 5 == 0 ? 1.6 : 1));
+      canvas.drawLine(inner, outer, i <= time.minute ? lit : dim);
+    }
+    final zone = _layout(
+      _zoneCode(time.timeZoneName),
+      size: side * .075,
+      color: const Color(0xffd1d1d6),
+      weight: FontWeight.w700,
+    );
+    final clock = _layout(
+      '${_hour(time, use24).padLeft(use24 ? 2 : 1, '0')}:${_minute(time)}',
+      size: side * .25,
+      weight: FontWeight.w700,
+      spacing: -side * .006,
+    );
+    zone.paint(
+      canvas,
+      Offset(
+        centre.dx - zone.width / 2,
+        centre.dy - clock.height / 2 - zone.height - side * .03,
+      ),
+    );
+    clock.paint(
+      canvas,
+      Offset(
+        centre.dx - clock.width / 2,
+        centre.dy - clock.height / 2 + side * .02,
+      ),
+    );
+    zone.dispose();
+    clock.dispose();
+
+    // The calendar fills the rest of the width.
+    final calLeft = panel.right + size.width * .06;
+    final calWidth = size.width * .94 - calLeft;
+    final cell = calWidth / 7;
+    final first = DateTime(time.year, time.month);
+    final days = DateTime(time.year, time.month + 1, 0).day;
+    final offset = first.weekday % 7; // Sunday first
+    final rows = ((offset + days) / 7).ceil();
+    final rowH = math.min(cell * .82, side * .78 / (rows + 1));
+    final month = _layout(
+      _months[time.month - 1],
+      size: rowH * .5,
+      color: _red,
+      weight: FontWeight.w700,
+      spacing: rowH * .02,
+    );
+    // Centre the whole calendar against the clock square.
+    final block = month.height + rowH * .45 + rowH * (rows + 1);
+    final calTop = centre.dy - block / 2;
+    month.paint(canvas, Offset(calLeft + cell * .5 - rowH * .25, calTop));
+    final gridTop = calTop + month.height + rowH * .45;
+    const names = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    for (var c = 0; c < 7; c++) {
+      _text(
+        canvas,
+        names[c],
+        Offset(calLeft + cell * (c + .5), gridTop + rowH * .5),
+        size: rowH * .4,
+        color: const Color(0xff8e8e93),
+        weight: FontWeight.w700,
+      );
+    }
+    for (var d = 1; d <= days; d++) {
+      final index = offset + d - 1;
+      final at = Offset(
+        calLeft + cell * (index % 7 + .5),
+        gridTop + rowH * (index ~/ 7 + 1.5),
+      );
+      final today = d == time.day;
+      if (today) {
+        canvas.drawCircle(at, rowH * .42, Paint()..color = _red);
+      }
+      _text(
+        canvas,
+        '$d',
+        at,
+        size: rowH * .42,
+        weight: today ? FontWeight.w800 : FontWeight.w600,
+      );
+    }
+    month.dispose();
+  }
+
+  @override
+  bool shouldRepaint(_CalendarFace old) =>
       old.time.minute != time.minute || old.time.hour != time.hour;
 }
 

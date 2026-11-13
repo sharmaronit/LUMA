@@ -195,9 +195,7 @@ void main() {
       await tester.pumpWidget(const SizedBox());
     },
   );
-  testWidgets('settings assigns shortcuts and app options save TV artwork', (
-    tester,
-  ) async {
+  testWidgets('app options save TV artwork', (tester) async {
     tester.view.physicalSize = const Size(960, 540);
     tester.view.devicePixelRatio = 1;
     addTearDown(() {
@@ -211,35 +209,6 @@ void main() {
     final prefs = await SharedPreferences.getInstance();
     await tester.pumpWidget(PreviewApp(preferences: prefs));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Clock'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Luma settings'));
-    await tester.pumpAndSettle();
-    await tester.tap(
-      find.byKey(const ValueKey('settings-category-Home & Apps')),
-    );
-    await tester.pumpAndSettle();
-    final shortcuts = find.byKey(const ValueKey('setting-remote-shortcuts'));
-    await tester.ensureVisible(shortcuts);
-    await tester.tap(shortcuts);
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey('remote-shortcut-1')));
-    await tester.pumpAndSettle();
-    expect(
-      find.descendant(
-        of: find.byType(LumaMenuDialog).last,
-        matching: find.byType(FocusHighlightLayer),
-      ),
-      findsOneWidget,
-    );
-    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-    await tester.pumpAndSettle();
-    await tester.sendKeyEvent(LogicalKeyboardKey.select);
-    await tester.pumpAndSettle();
-    expect(
-      jsonDecode(prefs.getString(AppCustomization.shortcutsKey)!)['1'],
-      'search',
-    );
     await tester.sendKeyEvent(LogicalKeyboardKey.home);
     await tester.pumpAndSettle();
     await tester.sendKeyEvent(LogicalKeyboardKey.keyM);
